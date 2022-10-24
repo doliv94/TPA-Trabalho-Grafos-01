@@ -8,13 +8,22 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 import geradorarquivos.*;
+
 import listadeadjacencias.ArestaAD;
+import listadeadjacencias.GrafoAD;
 import listadeadjacencias.VerticeAD;
+
 import listadearestas.ArestaAR;
+import listadearestas.GrafoAR;
 import listadearestas.VerticeAR;
 
-public class Main {
+import matrizdeadjacencias.GrafoMA;
+import matrizdeadjacencias.VerticeMA;
 
+public class Main<T> {
+    private GrafoAR<T> grafoAR;
+
+/*
     // Metodos para Matriz de Adjacencias
     public void buscaEmLarguraMA() {
 
@@ -87,7 +96,7 @@ public class Main {
     }
 
 
-
+*/
     // Metodos para Lista de Arestas
     private ArrayList<ArestaAR> obterDestinosAR(VerticeAR v) {
         ArrayList<ArestaAR> destinos = new ArrayList<ArestaAR>();
@@ -163,7 +172,9 @@ public class Main {
         System.out.println("\n\nRegistro salvo.");
     }
 
-    public static ArrayList<String[]> abreArquivo(String nomeArquivoEntrada) throws IOException {
+
+
+    public ArrayList<String[]> abreArquivo(String nomeArquivoEntrada) throws IOException {
         String caminhoEntradaRegistros = "_entrada_registros/";
         String entradaRegistro = caminhoEntradaRegistros + nomeArquivoEntrada;
 
@@ -176,18 +187,32 @@ public class Main {
         String linha = leitor.readLine();
         int qtdRegistros = Integer.parseInt(linha);
 
-        String[] primeiraLinha = { linha };
-        arquivoRegistros.add(primeiraLinha);
+        VerticeAR<String[]> cidade;
+        ArestaAR distanciaCidades;
+        float valorDistancia;
 
+        //String[] primeiraLinha = { linha };
+        //arquivoRegistros.add(primeiraLinha);
+
+        // gera lista de arestas
+        //
         for(int contador = 0; contador < qtdRegistros * 2; contador++) {
             linha = leitor.readLine();
             String[] conteudo = linha.split(";");
-            arquivoRegistros.add(conteudo);
+            //arquivoRegistros.add(conteudo);
+            if(contador < qtdRegistros) {
+                cidade.setValor(conteudo);
+
+                distanciaCidades.setOrigem(cidade);
+                distanciaCidades.setDestino();
+            } else {
+                valorDistancia = Float.parseFloat(conteudo[]);
+
+            }
         }
+
         arquivo.close();
 
-        //System.out.println(arquivoRegistros.get(1)[0]);
-        //System.out.println(Arrays.toString(arquivoRegistros.get(1)));
         System.out.println(Arrays.deepToString(arquivoRegistros.toArray()));
 
         return arquivoRegistros;
@@ -239,13 +264,15 @@ public class Main {
     }
 
     // Main
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public void main(String[] args) throws IOException, InterruptedException {
         GeradorArquivosGrafo g = new GeradorArquivosGrafo();
         ArrayList<String[]> arquivoRegistros;
         String nomeArquivoEntrada = "";
 
         nomeArquivoEntrada = g.geraArquivo(10);
         arquivoRegistros = abreArquivo(nomeArquivoEntrada); // consertar isso para converter a entrada para os 3 tipos
+
+
 
         mostraMenu();
     }

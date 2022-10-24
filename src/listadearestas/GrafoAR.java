@@ -2,13 +2,13 @@ package listadearestas;
 
 import java.util.ArrayList;
 
-public class GrafoAR<T> {
+public class GrafoAR {
     private ArrayList<ArestaAR> arestas;
-    private ArrayList<VerticeAR<T>> vertices;
+    private ArrayList<VerticeAR> vertices;
 
-    public VerticeAR<T> adicionarVertice(T valor) {
+    public VerticeAR adicionarVertice(T valor) {
 
-        VerticeAR<T> novo = new VerticeAR<T>(valor);
+        VerticeAR novo = new VerticeAR<>(valor);
         this.vertices.add(novo);
 
         return novo;
