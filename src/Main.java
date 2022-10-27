@@ -14,9 +14,9 @@ import listadeadjacencias.*;
 
 public class Main {
     private Grafo grafo;
+    private ArrayList<Vertice> vertices;
 
     // Metodo do lista de adjacencias
-    /*
     public void buscaEmLargura() {
         ArrayList<Vertice> marcados = new ArrayList<Vertice>();
         ArrayList<Vertice> fila = new ArrayList<Vertice>();
@@ -43,7 +43,7 @@ public class Main {
             Vertice proximo;
 
             for(int i = 0; i < destinos.size(); i++) {
-                proximo = destinos.get(i).getDestinos();
+                proximo = destinos.get(i).getDestino();
 
                 if(!marcados.contains(proximo)) {
                     fila.add(proximo);
@@ -51,7 +51,6 @@ public class Main {
             }
         }
     }
-*/
 
     //
     public static void salvaArquivo(String arquivo, ArrayList<String[]> arquivoRegistros) throws IOException {
