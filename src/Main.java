@@ -11,21 +11,20 @@ import geradorarquivos.*;
 import listadeadjacencias.*;
 
 
-
 public class Main {
-    private Grafo grafo;
-    private ArrayList<Vertice> vertices;
+    // instancia um grafo como variavel global que vai receber suas informacoes de um arquivo
+    private Grafo<String[]> grafo;
 
-    // Metodo do lista de adjacencias
-    public void buscaEmLargura() {
-        ArrayList<Vertice> marcados = new ArrayList<Vertice>();
-        ArrayList<Vertice> fila = new ArrayList<Vertice>();
+    // Metodo de lista de adjacencias
+    // chamar na opcao 2 do menu - falta revisar e consertar
+    public void buscaEmLargura(Vertice<String[]> cidadeOrigem) {
+        ArrayList<Vertice<String[]>> marcados = new ArrayList<>();
+        ArrayList<Vertice<String[]>> fila = new ArrayList<>();
 
         // Pego o primeiro vertice como ponto de partida e o coloco na fila
         // Poderia escolher qualquer outro...
         // Mas note que dependendo do grafo pode ser que vc nao caminhe por todos os vertices
-
-        Vertice atual = this.vertices.get(0);
+        Vertice<String[]> atual = cidadeOrigem;
         fila.add(atual);
 
         // Enquanto houver vertice na fila...
@@ -35,24 +34,25 @@ public class Main {
             fila.remove(0);
             marcados.add(atual);
 
-            System.out.println(atual.getValor());
+            System.out.println(Arrays.toString(atual.getValor()));
 
             // Depois pego a lista de adjacencia do no e se o no adjacente ainda
             // nao tiver sido visitado, o coloco na fila
-            ArrayList<Aresta> destinos = atual.getDestinos();
-            Vertice proximo;
+            ArrayList<Aresta<String[]>> destinos = atual.getDestinos();
+            Vertice<String[]> proximo;
 
-            for(int i = 0; i < destinos.size(); i++) {
-                proximo = destinos.get(i).getDestino();
+            for (Aresta<String[]> destino : destinos) {
+                proximo = destino.getDestino();
 
-                if(!marcados.contains(proximo)) {
+                if (!marcados.contains(proximo)) {
                     fila.add(proximo);
                 }
             }
         }
     }
 
-    //
+    // metodo para salvar arquivo de saída, precisa ser revisado e consertado antes de usar
+    // fazer ele criar/salvar o arquivo de retorno das opcoes 1 e 2 do menu principal
     public static void salvaArquivo(String arquivo, ArrayList<String[]> arquivoRegistros) throws IOException {
         String caminhoPasta = "_saida_registros/";
         String saidaRegistro = "_" + arquivo;
@@ -84,45 +84,49 @@ public class Main {
         System.out.println("\n\nRegistro salvo.");
     }
 
-    public static ArrayList<String[]> abreArquivo(String nomeArquivoEntrada) throws IOException {
+    // abre arquivo que foi gerado com as cidades e distancias
+    // faz a chamada para gerar o grafo
+    public static void abreArquivo(String nomeArquivoEntrada) throws IOException {
         String caminhoEntradaRegistros = "_entrada_registros/";
         String entradaRegistro = caminhoEntradaRegistros + nomeArquivoEntrada;
-
-        ArrayList<String[]> arquivoRegistros = new ArrayList<String[]>();
 
         FileReader arquivo = new FileReader(entradaRegistro);
         BufferedReader leitor = new BufferedReader(arquivo);
 
-        // primeira linha
+        // primeira linha do arquivo
         String linha = leitor.readLine();
         int qtdRegistros = Integer.parseInt(linha);
 
-        ArrayList<Vertice<String[]>> cidades = new ArrayList<>();
+        //
         Vertice<String[]> cidade = new Vertice<>();
-        ArrayList<String[]>distancias = new ArrayList<>();
+        ArrayList<Vertice<String[]>> cidades = new ArrayList<>();
 
-        Aresta distanciaCidades;
+        Aresta<String[]> distanciaCidade = new Aresta<>();
+        ArrayList<Aresta<String[]>> distanciasCidades = new ArrayList<>();
 
         for(int contador = 0; contador < qtdRegistros * 2; contador++) {
             linha = leitor.readLine();
             String[] conteudo = linha.split(";");
+
+            // adiciona primeiro as cidades
             if(contador < qtdRegistros) {
-                cidade.setValor(conteudo);
-                cidades.add(cidade);
-            } else {
-                distancias.add(conteudo);
+                cidade.setValor(conteudo); // coloca o codigo e o nome da cidade no vertice
+                cidades.add(cidade); // adiciona o vertice da cidade na lista dos vertices de cidades do grafo
+
+                distanciaCidade.setDestino(cidade); // coloca o vertice da cidade como um destino da cidade na aresta
+                distanciasCidades.add(distanciaCidade); // adiciona a aresta com a cidade de destino na lista de arestas
+            }
+            // depois adiciona as distancias
+            else {
+                //ver se precisa fazer um for para pegar cada float da linha de distancias do arquivo
             }
         }
 
-        System.out.println(Arrays.deepToString(cidades.toArray()));
 
         arquivo.close();
-
-        System.out.println(Arrays.deepToString(arquivoRegistros.toArray()));
-
-        return arquivoRegistros;
     }
 
+    // Limpa o console
     public static void limpaTela() throws IOException, InterruptedException {
         if(System.getProperty("os.name").contains("Windows")) {
             new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
@@ -130,8 +134,7 @@ public class Main {
     }
 
 
-
-    //
+    // Menu de opcoes do trabalho - falta revisar e consertar
     private static void mostraMenu() throws IOException, InterruptedException {
         Scanner input = new Scanner(System.in);
         int opcao = -1;
@@ -163,21 +166,23 @@ public class Main {
 
             } else if (opcao == 3) {
                 System.out.println("Tchauzim");
-
             }
         }
     }
 
     // Main
     public static void main(String[] args) throws IOException, InterruptedException {
-        GeradorArquivosGrafo g = new GeradorArquivosGrafo();
-        ArrayList<String[]> arquivoRegistros;
-        String nomeArquivoEntrada = "";
+        GeradorArquivosGrafo g = new GeradorArquivosGrafo(); // instancia um gerador de arquivos
+        String nomeArquivoEntrada = ""; // cria variavel que vai ter o nome do arquivo gerado
 
+        // gera um arquivo com a quantidade definida de cidades e distancias
+        // passa o nome do arquivo gerado para a variavel
         nomeArquivoEntrada = g.geraArquivo(10);
-        arquivoRegistros = abreArquivo(nomeArquivoEntrada); // consertar e fazer direito
 
+        // le o arquivo gerado
+        abreArquivo(nomeArquivoEntrada); // consertar e fazer direito
 
-        //mostraMenu();
+        // chama o menu de opcoes para o usuario
+        mostraMenu();
     }
 }

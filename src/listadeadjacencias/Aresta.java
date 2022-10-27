@@ -1,25 +1,25 @@
 package listadeadjacencias;
 
-public class Aresta {
-    private Vertice destino;
+public class Aresta<T> {
+    private Vertice<T> destino;
     private float peso;
 
     public Aresta(){ }
 
-    public Aresta(Vertice destino) {
+    public Aresta(Vertice<T> destino) {
         this.destino = destino;
     }
 
-    public Aresta(Vertice destino, float peso) {
+    public Aresta(Vertice<T> destino, float peso) {
         this.destino = destino;
         this.peso = peso;
     }
 
-    public Vertice getDestino() {
+    public Vertice<T> getDestino() {
         return destino;
     }
 
-    public void setDestino(Vertice destino) {
+    public void setDestino(Vertice<T> destino) {
         this.destino = destino;
     }
 

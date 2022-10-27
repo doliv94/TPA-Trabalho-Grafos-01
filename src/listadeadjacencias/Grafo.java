@@ -20,19 +20,19 @@ public class Grafo<T> {
     }
 
     public Vertice<T> adicionarVertice(T valor) {
-        Vertice<T> novo = new Vertice<T>(valor);
+        Vertice<T> novo = new Vertice<>(valor);
         this.vertices.add(novo);
 
         return novo;
     }
 
-    private Vertice obterVertice(T valor) {
-        Vertice v;
+    private Vertice<T> obterVertice(T valor) {
+        Vertice<T> v;
 
-        for(int i = 0; i < this.vertices.size(); i++) {
-            v = this.vertices.get(i);
+        for (Vertice<T> vertex : this.vertices) {
+            v = vertex;
 
-            if(v.getValor().equals(valor)) {
+            if (v.getValor().equals(valor)) {
                 return v;
             }
         }
@@ -42,7 +42,7 @@ public class Grafo<T> {
     }
 
     public void adicionarAresta(T origem, T destino, float peso) {
-        Vertice verticeOrigem, verticeDestino;
+        Vertice<T> verticeOrigem, verticeDestino;
 
         // Busco o vertice com o valor de origem
         verticeOrigem = obterVertice(origem);
@@ -61,6 +61,6 @@ public class Grafo<T> {
         }
 
         // Vou adicionar a aresta a lista de adjacencia do vertice de origem
-        verticeOrigem.adicionarDestino(new Aresta(verticeDestino, peso));
+        verticeOrigem.adicionarDestino(new Aresta<>(verticeDestino, peso));
     }
 }
