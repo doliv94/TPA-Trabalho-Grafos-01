@@ -8,67 +8,24 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 import geradorarquivos.*;
-
-import listadeadjacencias.ArestaAD;
-import listadeadjacencias.GrafoAD;
-import listadeadjacencias.VerticeAD;
-
-import listadearestas.ArestaAR;
-import listadearestas.GrafoAR;
-import listadearestas.VerticeAR;
-
-import matrizdeadjacencias.GrafoMA;
-import matrizdeadjacencias.VerticeMA;
-
-public class Main<T> {
-    private GrafoAR<T> grafoAR;
-
-/*
-    // Metodos para Matriz de Adjacencias
-    public void buscaEmLarguraMA() {
-
-        boolean marcados[] = new boolean[this.quantVertices];
-        int atual = 0;
-        ArrayList<Integer> fila = new ArrayList<Integer>();
-
-        fila.add(atual);
-
-        while(fila.size() > 0) {
-            atual = fila.get(0);
-            fila.remove(0);
-            marcados[atual] = true;
-
-            System.out.println(this.vertices.get(atual).getValor());
-
-            for(int dest = 0; dest < this.quantVertices; dest++) {
-                // Se o no eh adjacente
-                if(arestas[atual][dest] > 0) {
-                    // Se ele ainda nao foi visitado o coloco na fila
-                    if(!marcados[dest]) {
-                        fila.add(dest);
-                    }
-                }
-            }
-        }
-    }
+import listadeadjacencias.*;
 
 
 
-    // Metodos para Lista de Adjacencias
-    public ArrayList<ArestaAD> getDestinosAD() {
+public class Main {
+    private Grafo grafo;
 
-        return this.destinos;
-    }
-
-    public void buscaEmLarguraAD() {
-        ArrayList<VerticeAD> marcados = new ArrayList<VerticeAD>();
-        ArrayList<VerticeAD> fila = new ArrayList<VerticeAD>();
+    // Metodo do lista de adjacencias
+    /*
+    public void buscaEmLargura() {
+        ArrayList<Vertice> marcados = new ArrayList<Vertice>();
+        ArrayList<Vertice> fila = new ArrayList<Vertice>();
 
         // Pego o primeiro vertice como ponto de partida e o coloco na fila
         // Poderia escolher qualquer outro...
         // Mas note que dependendo do grafo pode ser que vc nao caminhe por todos os vertices
 
-        VerticeAD atual = this.vertices.get(0);
+        Vertice atual = this.vertices.get(0);
         fila.add(atual);
 
         // Enquanto houver vertice na fila...
@@ -82,11 +39,11 @@ public class Main<T> {
 
             // Depois pego a lista de adjacencia do no e se o no adjacente ainda
             // nao tiver sido visitado, o coloco na fila
-            ArrayList<ArestaAD> destinos = atual.getDestinosAD();
-            VerticeAD proximo;
+            ArrayList<Aresta> destinos = atual.getDestinos();
+            Vertice proximo;
 
             for(int i = 0; i < destinos.size(); i++) {
-                proximo = destinos.get(i).getDestinosAD();
+                proximo = destinos.get(i).getDestinos();
 
                 if(!marcados.contains(proximo)) {
                     fila.add(proximo);
@@ -94,51 +51,7 @@ public class Main<T> {
             }
         }
     }
-
-
 */
-    // Metodos para Lista de Arestas
-    private ArrayList<ArestaAR> obterDestinosAR(VerticeAR v) {
-        ArrayList<ArestaAR> destinos = new ArrayList<ArestaAR>();
-        ArestaAR atual;
-
-        for(int i = 0; i < this.arestas.size(); i++) {
-            atual = this.arestas.get(i);
-
-            if(atual.getOrigem().equals(v)) {
-                destinos.add(atual);
-            }
-        }
-        return destinos;
-    }
-
-    public void buscaEmLarguraAR() {
-        ArrayList<VerticeAR> marcados = new ArrayList<VerticeAR>();
-        ArrayList<VerticeAR> fila = new ArrayList<VerticeAR>();
-        VerticeAR atual = this.vertices.get(0);
-        fila.add(atual);
-
-        while (fila.size() > 0) {
-            atual = fila.get(0);
-            fila.remove(0);
-            marcados.add(atual);
-
-            System.out.println(atual.getValor());
-
-            ArrayList<ArestaAR> destinos = this.obterDestinosAR(atual);
-            VerticeAR proximo;
-
-            for(int i = 0; i < destinos.size(); i++) {
-                proximo = destinos.get(i).getDestino();
-
-                if(!marcados.contains(proximo)) {
-                    fila.add(proximo);
-                }
-            }
-        }
-    }
-
-
 
     //
     public static void salvaArquivo(String arquivo, ArrayList<String[]> arquivoRegistros) throws IOException {
@@ -172,9 +85,7 @@ public class Main<T> {
         System.out.println("\n\nRegistro salvo.");
     }
 
-
-
-    public ArrayList<String[]> abreArquivo(String nomeArquivoEntrada) throws IOException {
+    public static ArrayList<String[]> abreArquivo(String nomeArquivoEntrada) throws IOException {
         String caminhoEntradaRegistros = "_entrada_registros/";
         String entradaRegistro = caminhoEntradaRegistros + nomeArquivoEntrada;
 
@@ -187,29 +98,24 @@ public class Main<T> {
         String linha = leitor.readLine();
         int qtdRegistros = Integer.parseInt(linha);
 
-        VerticeAR<String[]> cidade;
-        ArestaAR distanciaCidades;
-        float valorDistancia;
+        ArrayList<Vertice<String[]>> cidades = new ArrayList<>();
+        Vertice<String[]> cidade = new Vertice<>();
+        ArrayList<String[]>distancias = new ArrayList<>();
 
-        //String[] primeiraLinha = { linha };
-        //arquivoRegistros.add(primeiraLinha);
+        Aresta distanciaCidades;
 
-        // gera lista de arestas
-        //
         for(int contador = 0; contador < qtdRegistros * 2; contador++) {
             linha = leitor.readLine();
             String[] conteudo = linha.split(";");
-            //arquivoRegistros.add(conteudo);
             if(contador < qtdRegistros) {
                 cidade.setValor(conteudo);
-
-                distanciaCidades.setOrigem(cidade);
-                distanciaCidades.setDestino();
+                cidades.add(cidade);
             } else {
-                valorDistancia = Float.parseFloat(conteudo[]);
-
+                distancias.add(conteudo);
             }
         }
+
+        System.out.println(Arrays.deepToString(cidades.toArray()));
 
         arquivo.close();
 
@@ -264,16 +170,15 @@ public class Main<T> {
     }
 
     // Main
-    public void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         GeradorArquivosGrafo g = new GeradorArquivosGrafo();
         ArrayList<String[]> arquivoRegistros;
         String nomeArquivoEntrada = "";
 
         nomeArquivoEntrada = g.geraArquivo(10);
-        arquivoRegistros = abreArquivo(nomeArquivoEntrada); // consertar isso para converter a entrada para os 3 tipos
+        arquivoRegistros = abreArquivo(nomeArquivoEntrada); // consertar e fazer direito
 
 
-
-        mostraMenu();
+        //mostraMenu();
     }
 }
