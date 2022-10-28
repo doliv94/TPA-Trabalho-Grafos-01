@@ -93,7 +93,7 @@ public class Main {
             System.out.print("____Destino: \n");
 
             for(int contador = 0; contador < cidade.getDestinos().size(); contador++) {
-                System.out.print("    " + contador + ": ");
+                System.out.print("    " + (contador + 1) + ": ");
                 System.out.println(Arrays.deepToString(cidade.getDestinos().get(contador).getDestino().getValor()));
                 System.out.print("      Distância: ");
                 System.out.println(cidade.getDestinos().get(contador).getPeso());
