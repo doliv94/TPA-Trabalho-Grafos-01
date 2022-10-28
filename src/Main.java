@@ -12,8 +12,6 @@ import listadeadjacencias.*;
 
 
 public class Main {
-    // instancia um grafo como variavel global que vai receber suas informacoes de um arquivo
-    private Grafo<String[]> grafo;
 
     // Metodo de lista de adjacencias
     // chamar na opcao 2 do menu - falta revisar e consertar
@@ -53,7 +51,7 @@ public class Main {
 
     // metodo para salvar arquivo de saída, precisa ser revisado e consertado antes de usar
     // fazer ele criar/salvar o arquivo de retorno das opcoes 1 e 2 do menu principal
-    public static void salvaArquivo(String arquivo, ArrayList<String[]> arquivoRegistros) throws IOException {
+    private static void salvaArquivo(String arquivo, ArrayList<String[]> arquivoRegistros) throws IOException {
         String caminhoPasta = "_saida_registros/";
         String saidaRegistro = "_" + arquivo;
 
@@ -84,9 +82,56 @@ public class Main {
         System.out.println("\n\nRegistro salvo.");
     }
 
+
+    //
+    private static void imprimeGrafo(Grafo<String[]> grafo) {
+        System.out.println("Grafo - Relação das Distâncias entre as Cidades");
+
+        for(Vertice<String[]> cidade: grafo.getVertices()) {
+            System.out.print("\n__Cidade Origem: ");
+            System.out.println(Arrays.deepToString(cidade.getValor()));
+            System.out.print("____Destino: \n");
+
+            for(int contador = 0; contador < cidade.getDestinos().size(); contador++) {
+                System.out.print("    " + contador + ": ");
+                System.out.println(Arrays.deepToString(cidade.getDestinos().get(contador).getDestino().getValor()));
+                System.out.print("      Distância: ");
+                System.out.println(cidade.getDestinos().get(contador).getPeso());
+            }
+        }
+    }
+
+    //
+    private static Grafo<String[]> montaGrafo(ArrayList<Vertice<String[]>> cidades, ArrayList<String[]> pesos) {
+        Grafo<String[]> grafo = new Grafo<>();
+
+
+        for(int cidade = 0; cidade < cidades.size(); cidade++) {
+            ArrayList<Aresta<String[]>> cidadesDestino = new ArrayList<>();
+
+            for(int contador = 0; contador < pesos.size(); contador++) {
+                Aresta<String[]> cidadeDestino = new Aresta<>();
+
+                cidadeDestino.setDestino(cidades.get(contador));
+                cidadeDestino.setPeso(Float.parseFloat(pesos.get(cidade)[contador].replace(',', '.')));
+
+                cidadesDestino.add(cidadeDestino);
+            }
+            cidades.get(cidade).setDestinos(cidadesDestino);
+        }
+
+        grafo.setVertices(cidades);
+
+        return grafo;
+
+        //cidadeDestino.setDestino(cidade); // coloca o vertice da cidade como um destino da cidade na aresta
+        //distanciasCidades.add(distanciaCidade); // adiciona a aresta com a cidade de destino na lista de arestas
+
+    }
+
     // abre arquivo que foi gerado com as cidades e distancias
     // faz a chamada para gerar o grafo
-    public static void abreArquivo(String nomeArquivoEntrada) throws IOException {
+    private static Grafo<String[]> abreArquivo(String nomeArquivoEntrada) throws IOException {
         String caminhoEntradaRegistros = "_entrada_registros/";
         String entradaRegistro = caminhoEntradaRegistros + nomeArquivoEntrada;
 
@@ -98,36 +143,35 @@ public class Main {
         int qtdRegistros = Integer.parseInt(linha);
 
         //
-        Vertice<String[]> cidade = new Vertice<>();
         ArrayList<Vertice<String[]>> cidades = new ArrayList<>();
-
-        Aresta<String[]> distanciaCidade = new Aresta<>();
-        ArrayList<Aresta<String[]>> distanciasCidades = new ArrayList<>();
+        ArrayList<String[]> pesos = new ArrayList<>();
 
         for(int contador = 0; contador < qtdRegistros * 2; contador++) {
+            Vertice<String[]> cidade = new Vertice<>();
+
             linha = leitor.readLine();
             String[] conteudo = linha.split(";");
 
             // adiciona primeiro as cidades
             if(contador < qtdRegistros) {
+
                 cidade.setValor(conteudo); // coloca o codigo e o nome da cidade no vertice
                 cidades.add(cidade); // adiciona o vertice da cidade na lista dos vertices de cidades do grafo
-
-                distanciaCidade.setDestino(cidade); // coloca o vertice da cidade como um destino da cidade na aresta
-                distanciasCidades.add(distanciaCidade); // adiciona a aresta com a cidade de destino na lista de arestas
             }
             // depois adiciona as distancias
             else {
+                pesos.add(conteudo);
                 //ver se precisa fazer um for para pegar cada float da linha de distancias do arquivo
             }
         }
 
-
         arquivo.close();
+
+        return montaGrafo(cidades, pesos);
     }
 
     // Limpa o console
-    public static void limpaTela() throws IOException, InterruptedException {
+    private static void limpaTela() throws IOException, InterruptedException {
         if(System.getProperty("os.name").contains("Windows")) {
             new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
         }
@@ -172,6 +216,9 @@ public class Main {
 
     // Main
     public static void main(String[] args) throws IOException, InterruptedException {
+        // instancia um grafo como variavel global que vai receber suas informacoes de um arquivo
+        Grafo<String[]> grafo = new Grafo<>();
+
         GeradorArquivosGrafo g = new GeradorArquivosGrafo(); // instancia um gerador de arquivos
         String nomeArquivoEntrada = ""; // cria variavel que vai ter o nome do arquivo gerado
 
@@ -180,7 +227,9 @@ public class Main {
         nomeArquivoEntrada = g.geraArquivo(10);
 
         // le o arquivo gerado
-        abreArquivo(nomeArquivoEntrada); // consertar e fazer direito
+        grafo = abreArquivo(nomeArquivoEntrada); // consertar e fazer direito
+
+        imprimeGrafo(grafo);
 
         // chama o menu de opcoes para o usuario
         mostraMenu();
