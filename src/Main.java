@@ -83,21 +83,50 @@ public class Main {
     }
 
 
+    public static void obterCaminhos(Grafo<String[]> grafo, int entrada) {
+        Scanner voltar = new Scanner(System.in);
+
+        System.out.println("obterCaminhos");
+
+        System.out.println("\nAperte enter para voltar ao Menu");
+        voltar.nextLine();
+    }
+
+    public static void obterCidadesVizinhas(Grafo<String[]> grafo, int entrada) {
+        Scanner voltar = new Scanner(System.in);
+
+        Vertice<String[]> cidadeOrigem = grafo.getVertices().get(entrada);
+        System.out.println("Cidade de Origem: " + Arrays.deepToString(cidadeOrigem.getValor()));
+
+        imprimeDestinos(cidadeOrigem, false);
+
+        System.out.println("\nAperte enter para voltar ao Menu");
+        voltar.nextLine();
+    }
+
     //
-    private static void imprimeGrafo(Grafo<String[]> grafo) {
-        System.out.println("Grafo - Relação das Distâncias entre as Cidades");
 
-        for(Vertice<String[]> cidade: grafo.getVertices()) {
-            System.out.print("\n__Cidade Origem: ");
-            System.out.println(Arrays.deepToString(cidade.getValor()));
-            System.out.print("____Destino: \n");
+    private static void imprimeDestinos(Vertice<String[]> cidade, boolean todas) {
+        System.out.print("____Destino: \n");
 
-            for(int contador = 0; contador < cidade.getDestinos().size(); contador++) {
-                System.out.print("    " + contador + ": ");
+        for(int contador = 0; contador < cidade.getDestinos().size(); contador++) {
+            if(todas || cidade.getDestinos().get(contador).getPeso() > 0) {
+                System.out.print("    Cidade de Destino: ");
                 System.out.println(Arrays.deepToString(cidade.getDestinos().get(contador).getDestino().getValor()));
                 System.out.print("      Distância: ");
                 System.out.println(cidade.getDestinos().get(contador).getPeso());
             }
+        }
+    }
+
+    private static void imprimeCidades(Grafo<String[]> grafo) {
+        System.out.println("\nGrafo - Relação das Distâncias entre as Cidades");
+
+        for(Vertice<String[]> cidade: grafo.getVertices()) {
+            System.out.print("\n__Cidade Origem: ");
+            System.out.println(Arrays.deepToString(cidade.getValor()));
+
+            imprimeDestinos(cidade, true);
         }
     }
 
@@ -179,7 +208,7 @@ public class Main {
 
 
     // Menu de opcoes do trabalho - falta revisar e consertar
-    private static void mostraMenu() throws IOException, InterruptedException {
+    private static void mostraMenu(Grafo<String[]> grafo) throws IOException, InterruptedException {
         Scanner input = new Scanner(System.in);
         int opcao = -1;
         int entrada;
@@ -198,17 +227,21 @@ public class Main {
 
             if (opcao == 1) {
                 System.out.println("OBTER CIDADES VIZINHAS");
-                System.out.println("Digite o código da cidade de origem:");
+                System.out.println("Digite o código da cidade de origem (0 a " + grafo.getVertices().size() + "):");
                 System.out.print("-> ");
                 entrada = input.nextInt();
 
-            } else if (opcao == 2) {
+                obterCidadesVizinhas(grafo, entrada);
+            }
+            else if (opcao == 2) {
                 System.out.println("OBTER TODOS OS CAMINHOS DA CIDADE");
-                System.out.println("Digite o código da cidade de origem:");
+                System.out.println("Digite o código da cidade de origem (0 a " + grafo.getVertices().size() + "):");
                 System.out.print("-> ");
                 entrada = input.nextInt();
 
-            } else if (opcao == 3) {
+                obterCaminhos(grafo, entrada);
+            }
+            else if (opcao == 3) {
                 System.out.println("Tchauzim");
             }
         }
@@ -229,9 +262,9 @@ public class Main {
         // le o arquivo gerado
         grafo = abreArquivo(nomeArquivoEntrada); // consertar e fazer direito
 
-        imprimeGrafo(grafo);
+        imprimeCidades(grafo);
 
         // chama o menu de opcoes para o usuario
-        mostraMenu();
+        mostraMenu(grafo);
     }
 }
