@@ -15,7 +15,7 @@ public class Main {
 
     // Metodo de lista de adjacencias
     // chamar na opcao 2 do menu - falta revisar e consertar
-    public void buscaEmLargura(Vertice<String[]> cidadeOrigem) {
+    public static void buscaEmLargura(Vertice<String[]> cidadeOrigem) {
         ArrayList<Vertice<String[]>> marcados = new ArrayList<>();
         ArrayList<Vertice<String[]>> fila = new ArrayList<>();
 
@@ -32,18 +32,20 @@ public class Main {
             fila.remove(0);
             marcados.add(atual);
 
-            System.out.println(Arrays.toString(atual.getValor()));
+            System.out.println(Arrays.deepToString(atual.getValor()));
 
             // Depois pego a lista de adjacencia do no e se o no adjacente ainda
             // nao tiver sido visitado, o coloco na fila
             ArrayList<Aresta<String[]>> destinos = atual.getDestinos();
-            Vertice<String[]> proximo;
 
-            for (Aresta<String[]> destino : destinos) {
-                proximo = destino.getDestino();
+            for (Aresta<String[]> destino: destinos) {
+                Vertice<String[]> proximo = destino.getDestino();
 
-                if (!marcados.contains(proximo)) {
-                    fila.add(proximo);
+                if (!marcados.contains(proximo) && destino.getPeso() > 0) {
+                    if(!fila.contains(proximo)) {
+                        fila.add(proximo);
+                        //System.out.println("a " + Arrays.deepToString(proximo.getValor()));
+                    }
                 }
             }
         }
@@ -51,22 +53,23 @@ public class Main {
 
     public static void obterCaminhos(Grafo<String[]> grafo, int entrada) {
         Scanner voltar = new Scanner(System.in);
+        Vertice<String[]> cidadeOrigem = grafo.getVertices().get(entrada - 1);
 
-        System.out.println("obterCaminhos");
+        buscaEmLargura(cidadeOrigem);
 
-        System.out.println("\nAperte enter para voltar ao Menu");
+        System.out.println("\nAperte enter para voltar");
         voltar.nextLine();
     }
 
     public static void obterCidadesVizinhas(Grafo<String[]> grafo, int entrada) {
         Scanner voltar = new Scanner(System.in);
 
-        Vertice<String[]> cidadeOrigem = grafo.getVertices().get(entrada);
+        Vertice<String[]> cidadeOrigem = grafo.getVertices().get(entrada - 1);
         System.out.println("Cidade de Origem: " + Arrays.deepToString(cidadeOrigem.getValor()));
 
         imprimeDestinos(cidadeOrigem, false);
 
-        System.out.println("\nAperte enter para voltar ao Menu");
+        System.out.println("\nAperte enter para voltar");
         voltar.nextLine();
     }
 
@@ -225,7 +228,7 @@ public class Main {
 
             if (opcao == 1) {
                 System.out.println("OBTER CIDADES VIZINHAS");
-                System.out.println("Digite o código da cidade de origem (0 a " + grafo.getVertices().size() + "):");
+                System.out.println("Digite o código da cidade de origem (1 a " + grafo.getVertices().size() + "):");
                 System.out.print("-> ");
                 entrada = input.nextInt();
 
@@ -233,7 +236,7 @@ public class Main {
             }
             else if (opcao == 2) {
                 System.out.println("OBTER TODOS OS CAMINHOS DA CIDADE");
-                System.out.println("Digite o código da cidade de origem (0 a " + grafo.getVertices().size() + "):");
+                System.out.println("Digite o código da cidade de origem (1 a " + grafo.getVertices().size() + "):");
                 System.out.print("-> ");
                 entrada = input.nextInt();
 
