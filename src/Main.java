@@ -49,40 +49,6 @@ public class Main {
         }
     }
 
-    // metodo para salvar arquivo de saída, precisa ser revisado e consertado antes de usar
-    // fazer ele criar/salvar o arquivo de retorno das opcoes 1 e 2 do menu principal
-    private static void salvaArquivo(String arquivo, ArrayList<String[]> arquivoRegistros) throws IOException {
-        String caminhoPasta = "_saida_registros/";
-        String saidaRegistro = "_" + arquivo;
-
-        File pastaSaida = new File(caminhoPasta);
-        if (!pastaSaida.exists()){
-            pastaSaida.mkdir();
-        }
-
-        FileWriter novoRegistro = new FileWriter(new File(pastaSaida, saidaRegistro));
-
-        for(String[] linha: arquivoRegistros) {
-            String conteudo = "";
-
-            for(int dado = 0; dado < linha.length; dado++) {
-                StringBuilder sb = new StringBuilder();
-                if(dado == linha.length - 1) {
-                    conteudo = sb.append(conteudo).append(linha[dado]).toString();
-                }
-                else {
-                    conteudo = sb.append(conteudo).append(linha[dado]).append(";").toString();
-                }
-            }
-            novoRegistro.write(conteudo + "\n");
-        }
-
-        novoRegistro.close();
-
-        System.out.println("\n\nRegistro salvo.");
-    }
-
-
     public static void obterCaminhos(Grafo<String[]> grafo, int entrada) {
         Scanner voltar = new Scanner(System.in);
 
@@ -105,7 +71,6 @@ public class Main {
     }
 
     //
-
     private static void imprimeDestinos(Vertice<String[]> cidade, boolean todas) {
         System.out.print("____Destino: \n");
 
@@ -199,6 +164,39 @@ public class Main {
         return montaGrafo(cidades, pesos);
     }
 
+    // metodo para salvar arquivo de saída, precisa ser revisado e consertado antes de usar
+    // fazer ele criar/salvar o arquivo de retorno das opcoes 1 e 2 do menu principal
+    private static void salvaArquivo(String arquivo, ArrayList<String[]> arquivoRegistros) throws IOException {
+        String caminhoPasta = "_saida_registros/";
+        String saidaRegistro = "_" + arquivo;
+
+        File pastaSaida = new File(caminhoPasta);
+        if (!pastaSaida.exists()){
+            pastaSaida.mkdir();
+        }
+
+        FileWriter novoRegistro = new FileWriter(new File(pastaSaida, saidaRegistro));
+
+        for(String[] linha: arquivoRegistros) {
+            String conteudo = "";
+
+            for(int dado = 0; dado < linha.length; dado++) {
+                StringBuilder sb = new StringBuilder();
+                if(dado == linha.length - 1) {
+                    conteudo = sb.append(conteudo).append(linha[dado]).toString();
+                }
+                else {
+                    conteudo = sb.append(conteudo).append(linha[dado]).append(";").toString();
+                }
+            }
+            novoRegistro.write(conteudo + "\n");
+        }
+
+        novoRegistro.close();
+
+        System.out.println("\n\nRegistro salvo.");
+    }
+
     // Limpa o console
     private static void limpaTela() throws IOException, InterruptedException {
         if(System.getProperty("os.name").contains("Windows")) {
@@ -250,10 +248,10 @@ public class Main {
     // Main
     public static void main(String[] args) throws IOException, InterruptedException {
         // instancia um grafo como variavel global que vai receber suas informacoes de um arquivo
-        Grafo<String[]> grafo = new Grafo<>();
+        Grafo<String[]> grafo;
 
         GeradorArquivosGrafo g = new GeradorArquivosGrafo(); // instancia um gerador de arquivos
-        String nomeArquivoEntrada = ""; // cria variavel que vai ter o nome do arquivo gerado
+        String nomeArquivoEntrada; // cria variavel que vai ter o nome do arquivo gerado
 
         // gera um arquivo com a quantidade definida de cidades e distancias
         // passa o nome do arquivo gerado para a variavel
