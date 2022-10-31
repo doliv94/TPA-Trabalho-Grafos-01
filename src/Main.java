@@ -194,7 +194,7 @@ public class Main {
 
 
     // Menu de opcoes do usuario
-    private static void mostraMenu(Grafo<String[]> grafo, String nomeArquivoEntrada) throws IOException, InterruptedException {
+    private static void mostraMenu(Grafo<String[]> grafo) throws IOException, InterruptedException {
         Scanner input = new Scanner(System.in); // Cria o leitor da entrada do usuario
         String opcao = ""; // Variavel que vai guiar as opcoes do menu
         int entrada; // Variavel que vai armazenar o valor da entrada do usuario
@@ -256,6 +256,6 @@ public class Main {
         imprimeCidades(grafo);
 
         // Chama o menu de opcoes para o usuario
-        mostraMenu(grafo, nomeArquivoEntrada);
+        mostraMenu(grafo);
     }
 }
