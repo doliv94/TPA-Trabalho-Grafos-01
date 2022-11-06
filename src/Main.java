@@ -207,7 +207,7 @@ public class Main {
             System.out.print("\nO código deve ser um número entre 1 e " + grafo.getVertices().size() + ".");
         }
 
-        return entradaOk; // A entrada foi invalida, volta para o menu
+        return entradaOk; // Retorna o codigo do usuario se estiver ok, e -1 se for um codigo invalido
     }
 
     // Menu de opcoes do usuario
@@ -215,7 +215,7 @@ public class Main {
         Scanner input = new Scanner(System.in); // Cria o leitor da entrada do usuario
         String opcao = ""; // Variavel que vai guiar as opcoes do menu
 
-        int entrada;
+        int entrada; // Vai receber a entrada do usuario de codigo da cidade
 
         // O menu com as opcoes vai rodar enquanto o usuario nao escolher umas das 3 opcoes disponiveis
         while (!opcao.equals("3")) {
