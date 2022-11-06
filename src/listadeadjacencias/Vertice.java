@@ -1,7 +1,6 @@
 package listadeadjacencias;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Vertice<T> {
     // Valor do vertice, no caso dessa entrega serao
