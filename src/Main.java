@@ -21,6 +21,7 @@ public class Main {
         for (Vertice<String[]> cidadeVisitada: marcados) {
             System.out.print(Arrays.deepToString(cidadeVisitada.getValor()) + " ");
         }
+        System.out.print("\n");
     }
 
     // Metodo de busca em largura
@@ -199,12 +200,12 @@ public class Main {
             entradaOk = input.nextInt(); // Nao eh maior, pode chamar o metodo escolhido
 
             if (entradaOk > grafo.getVertices().size()) { // Se o numero for maior que a quantidade de cidades
-                System.out.print("\nA cidade com esse código não consta no arquivo.");
+                System.out.println("\nA cidade com esse código não consta no arquivo.");
                 entradaOk = -1;
             }
         }
         else {
-            System.out.print("\nO código deve ser um número entre 1 e " + grafo.getVertices().size() + ".");
+            System.out.println("\nO código deve ser um número entre 1 e " + grafo.getVertices().size() + ".");
         }
 
         return entradaOk; // Retorna o codigo do usuario se estiver ok, e -1 se for um codigo invalido
@@ -240,7 +241,7 @@ public class Main {
                     }
 
                     input = new Scanner(System.in);
-                    System.out.println("\nAperte enter para voltar");
+                    System.out.print("\nAperte enter para voltar");
                     input.nextLine();
                 }
                 case "2" -> {
@@ -253,10 +254,10 @@ public class Main {
                     }
 
                     input = new Scanner(System.in);
-                    System.out.println("\nAperte enter para voltar");
+                    System.out.print("\nAperte enter para voltar");
                     input.nextLine();
                 }
-                case "3" -> System.out.println("\n\nTchauzim!"); // Encerra o programa
+                case "3" -> System.out.println("\nTchauzim!"); // Encerra o programa
             }
         }
     }
