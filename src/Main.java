@@ -228,6 +228,7 @@ public class Main {
                 case "1" -> {
                     System.out.println("\n\n******OBTER TODAS AS CIDADES VIZINHAS******");
 
+                    // Verifica se o valor digitado eh uma entrada valida
                     if(checaEntrada(grafo, input)) {
                         obterCidadesVizinhas(grafo, input.nextInt());
                     }
@@ -239,6 +240,7 @@ public class Main {
                 case "2" -> {
                     System.out.println("\n\n*****OBTER TODOS OS CAMINHOS DA CIDADE*****");
 
+                    // Verifica se o valor digitado eh uma entrada valida
                     if(checaEntrada(grafo, input)) {
                         obterCaminhos(grafo, input.nextInt());
                     }
