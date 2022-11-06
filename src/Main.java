@@ -71,31 +71,21 @@ public class Main {
     // Metodo para obter caminhos, vai passar o vertice da cidade de origem
     // para o metodo de busca em largura com base no grafo e na entrada do usuario
     public static void obterCaminhos(Grafo<String[]> grafo, int entrada) {
-        Scanner voltar = new Scanner(System.in); // Um leitor que ira esperar o enter do usuario para voltar para o menu
-
         Vertice<String[]> cidadeOrigem = grafo.getVertices().get(entrada - 1); // Pega no grafo o vertice da cidade de origem de acordo com a entrada do usuario
         System.out.println("\nCidade Entrada: " + Arrays.deepToString(cidadeOrigem.getValor()));
 
         // Chama o metodo que vai fazer a busca em largura para encontrar os caminhos a partir do vertice da cidade de origem
         buscaEmLargura(cidadeOrigem);
-
-        System.out.print("\n\nAperte enter para voltar");
-        voltar.nextLine();
     }
 
     // Metodo para obter cidades vizinhas, vai chamar a impressao apenas das cidades adjacentes a
     // cidade que o usuario escolheu como origem
     public static void obterCidadesVizinhas(Grafo<String[]> grafo, int entrada) {
-        Scanner voltar = new Scanner(System.in); // Um leitor que ira esperar o enter do usuario para voltar para o menu
-
         Vertice<String[]> cidadeOrigem = grafo.getVertices().get(entrada - 1); // Pega no grafo o vertice da cidade de origem de acordo com a entrada do usuario
         System.out.println("\nCidade Entrada: " + Arrays.deepToString(cidadeOrigem.getValor()) + "\n");
 
         // Chama o metodo de impressao dos destinos, passando o vertice de origem como parametro
         imprimeDestinos(cidadeOrigem, false); // O false eh para dizer que nao vai imprimir todas as cidades como destino da cidade de origem, apenas as que sao adjacentes
-
-        System.out.print("\nAperte enter para voltar");
-        voltar.nextLine();
     }
 
     // Metodo para impressao das cidades que sao destino
@@ -197,39 +187,65 @@ public class Main {
         return montaGrafo(cidades, pesos);
     }
 
+    // Metodo para garantir que o codigo entrado pelo usuario eh um valor valido para leitura do grafo
+    private static boolean checaEntrada (Grafo<String[]> grafo, Scanner input) {
+        System.out.println("\nDigite o código da cidade de origem (1 a " + grafo.getVertices().size() + "):");
+        System.out.print("-> ");
+
+        // Se o valor de entrada for um numero
+        if (input.hasNext("\\d+")) {
+            if (input.nextInt() > grafo.getVertices().size()) { // Se o numero for maior que a quantidade de cidades
+                System.out.print("\nA cidade com esse código não consta no arquivo.");
+            }
+            else {
+                return true; // Nao eh maior, pode chamar o metodo escolhido
+            }
+        }
+        else {
+            System.out.print("\nO código deve ser um número entre 1 e " + grafo.getVertices().size() + ".");
+        }
+
+        return false; // A entrada foi invalida, volta para o menu
+    }
+
     // Menu de opcoes do usuario
     private static void mostraMenu(Grafo<String[]> grafo) {
         Scanner input = new Scanner(System.in); // Cria o leitor da entrada do usuario
         String opcao = ""; // Variavel que vai guiar as opcoes do menu
-        int entrada; // Variavel que vai armazenar o valor da entrada do usuario
 
         // O menu com as opcoes vai rodar enquanto o usuario nao escolher umas das 3 opcoes disponiveis
         while (!opcao.equals("3")) {
-            System.out.println("\n***********************************\n");
+            System.out.println("\n*******************************************\n");
             System.out.println("     ESCOLHA A OPÇÃO");
             System.out.println("\n --- 1: OBTER TODAS AS CIDADES VIZINHAS");
             System.out.println(" --- 2: OBTER TODOS OS CAMINHOS DA CIDADE");
             System.out.println("\n --- 3: SAIR");
-            System.out.println("\n***********************************\n");
+            System.out.println("\n*******************************************\n");
             System.out.print("-> ");
             opcao = input.next();
 
             switch (opcao) {
                 case "1" -> {
-                    System.out.println("\n\n**OBTER TODAS AS CIDADES VIZINHAS**");
-                    System.out.println("\nDigite o código da cidade de origem (1 a " + grafo.getVertices().size() + "):");
-                    System.out.print("-> ");
-                    entrada = input.nextInt();
+                    System.out.println("\n\n******OBTER TODAS AS CIDADES VIZINHAS******");
 
-                    obterCidadesVizinhas(grafo, entrada);
+                    if(checaEntrada(grafo, input)) {
+                        obterCidadesVizinhas(grafo, input.nextInt());
+                    }
+
+                    input = new Scanner(System.in);
+                    System.out.println("\nAperte enter para voltar");
+                    input.nextLine();
                 }
                 case "2" -> {
-                    System.out.println("\n\n*OBTER TODOS OS CAMINHOS DA CIDADE*");
-                    System.out.println("\nDigite o código da cidade de origem (1 a " + grafo.getVertices().size() + "):");
-                    System.out.print("-> ");
-                    entrada = input.nextInt();
+                    System.out.println("\n\n*****OBTER TODOS OS CAMINHOS DA CIDADE*****");
 
-                    obterCaminhos(grafo, entrada);
+                    if(checaEntrada(grafo, input)) {
+                        obterCaminhos(grafo, input.nextInt());
+                    }
+
+                    input = new Scanner(System.in);
+                    System.out.println("\nAperte enter para voltar");
+                    input.nextLine();
                 }
                 case "3" -> System.out.println("\n\nTchauzim!"); // Encerra o programa
             }
