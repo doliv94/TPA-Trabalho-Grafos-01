@@ -188,30 +188,34 @@ public class Main {
     }
 
     // Metodo para garantir que o codigo entrado pelo usuario eh um valor valido para leitura do grafo
-    private static boolean checaEntrada (Grafo<String[]> grafo, Scanner input) {
+    private static int checaEntrada (Grafo<String[]> grafo, Scanner input) {
         System.out.println("\nDigite o código da cidade de origem (1 a " + grafo.getVertices().size() + "):");
         System.out.print("-> ");
 
+        int entradaOk = -1;
+
         // Se o valor de entrada for um numero
         if (input.hasNext("\\d+")) {
-            if (input.nextInt() > grafo.getVertices().size()) { // Se o numero for maior que a quantidade de cidades
+            entradaOk = input.nextInt(); // Nao eh maior, pode chamar o metodo escolhido
+
+            if (entradaOk > grafo.getVertices().size()) { // Se o numero for maior que a quantidade de cidades
                 System.out.print("\nA cidade com esse código não consta no arquivo.");
-            }
-            else {
-                return true; // Nao eh maior, pode chamar o metodo escolhido
+                entradaOk = -1;
             }
         }
         else {
             System.out.print("\nO código deve ser um número entre 1 e " + grafo.getVertices().size() + ".");
         }
 
-        return false; // A entrada foi invalida, volta para o menu
+        return entradaOk; // A entrada foi invalida, volta para o menu
     }
 
     // Menu de opcoes do usuario
     private static void mostraMenu(Grafo<String[]> grafo) {
         Scanner input = new Scanner(System.in); // Cria o leitor da entrada do usuario
         String opcao = ""; // Variavel que vai guiar as opcoes do menu
+
+        int entrada;
 
         // O menu com as opcoes vai rodar enquanto o usuario nao escolher umas das 3 opcoes disponiveis
         while (!opcao.equals("3")) {
@@ -229,8 +233,10 @@ public class Main {
                     System.out.println("\n\n******OBTER TODAS AS CIDADES VIZINHAS******");
 
                     // Verifica se o valor digitado eh uma entrada valida
-                    if(checaEntrada(grafo, input)) {
-                        obterCidadesVizinhas(grafo, input.nextInt());
+                    entrada = checaEntrada(grafo, input);
+                    if(entrada != -1) {
+                        System.out.println(entrada);
+                        obterCidadesVizinhas(grafo, entrada);
                     }
 
                     input = new Scanner(System.in);
@@ -241,8 +247,9 @@ public class Main {
                     System.out.println("\n\n*****OBTER TODOS OS CAMINHOS DA CIDADE*****");
 
                     // Verifica se o valor digitado eh uma entrada valida
-                    if(checaEntrada(grafo, input)) {
-                        obterCaminhos(grafo, input.nextInt());
+                    entrada = checaEntrada(grafo, input);
+                    if(entrada != -1) {
+                        obterCaminhos(grafo, entrada);
                     }
 
                     input = new Scanner(System.in);
