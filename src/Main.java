@@ -13,6 +13,41 @@ import listadeadjacencias.*;
 
 public class Main {
 
+    private static void imprimeCaminhoMinimo(Grafo<String[]> grafo, int cidadeOrigem, int cidadeDestino) {
+        ArrayList<Vertice<String[]>> caminho = new ArrayList<>();
+        Vertice<String[]> cidadeO = grafo.getVertices().get(cidadeOrigem - 1);
+        Vertice<String[]> cidadeD = grafo.getVertices().get(cidadeDestino - 1);
+
+        float caminhoTotal = 0;
+
+        if(cidadeO != null && cidadeD != null) {
+            System.out.println("\nCidade de Origem: " + Arrays.deepToString(cidadeO.getValor()));
+            System.out.println("Cidade de Destino: " + Arrays.deepToString(cidadeD.getValor()));
+
+            caminho = grafo.calculaCaminhoMinimo(cidadeO, cidadeD);
+
+            System.out.println("\n---");
+            System.out.println("\nCaminho Mínimo - Dijkstra:");
+
+            for (int contador = 0; contador < caminho.size(); contador++) {
+                if (contador > 0) {
+                    caminhoTotal += caminho.get(contador).getDestinos().get(contador - 1).getPeso();
+                }
+
+                if (contador != caminho.size() - 1) {
+                    System.out.print(Arrays.deepToString(caminho.get(contador).getValor()) + " -> ");
+                }
+                else {
+                    System.out.print(Arrays.deepToString(caminho.get(contador).getValor()));
+                }
+            }
+            System.out.println("\nDistância total entre as cidades: " + caminhoTotal);
+        }
+        else {
+            System.out.println("Não foi possível realizar a operação entre os valores requisitados.");
+        }
+    }
+
     // Metodo para imprimir a ordem em que as cidades foram visitadas quando foi realizada a busca em largura
     private static void imprimeBusca(ArrayList<Vertice<String[]>> marcados) {
         System.out.println("\n---");
@@ -190,9 +225,6 @@ public class Main {
 
     // Metodo para garantir que o codigo entrado pelo usuario eh um valor valido para leitura do grafo
     private static int checaEntrada (Grafo<String[]> grafo, Scanner input) {
-        System.out.println("\nDigite o código da cidade de origem (1 a " + grafo.getVertices().size() + "):");
-        System.out.print("-> ");
-
         int entradaOk = -1;
 
         // Se o valor de entrada for um numero
@@ -217,14 +249,16 @@ public class Main {
         String opcao = ""; // Variavel que vai guiar as opcoes do menu
 
         int entrada; // Vai receber a entrada do usuario de codigo da cidade
+        int entradaDestino;
 
         // O menu com as opcoes vai rodar enquanto o usuario nao escolher umas das 3 opcoes disponiveis
-        while (!opcao.equals("3")) {
+        while (!opcao.equals("0")) {
             System.out.println("\n*******************************************\n");
             System.out.println("     ESCOLHA A OPÇÃO");
             System.out.println("\n --- 1: OBTER TODAS AS CIDADES VIZINHAS");
             System.out.println(" --- 2: OBTER TODOS OS CAMINHOS DA CIDADE");
-            System.out.println("\n --- 3: SAIR");
+            System.out.println(" --- 3: CALCULAR CAMINHO MINIMO");
+            System.out.println("\n --- 0: SAIR");
             System.out.println("\n*******************************************\n");
             System.out.print("-> ");
             opcao = input.next();
@@ -232,6 +266,9 @@ public class Main {
             switch (opcao) {
                 case "1" -> {
                     System.out.println("\n\n******OBTER TODAS AS CIDADES VIZINHAS******");
+
+                    System.out.println("\nDigite o código da cidade de origem (1 a " + grafo.getVertices().size() + "):");
+                    System.out.print("-> ");
 
                     // Verifica se o valor digitado eh uma entrada valida
                     entrada = checaEntrada(grafo, input);
@@ -247,6 +284,9 @@ public class Main {
                 case "2" -> {
                     System.out.println("\n\n*****OBTER TODOS OS CAMINHOS DA CIDADE*****");
 
+                    System.out.println("\nDigite o código da cidade de origem (1 a " + grafo.getVertices().size() + "):");
+                    System.out.print("-> ");
+
                     // Verifica se o valor digitado eh uma entrada valida
                     entrada = checaEntrada(grafo, input);
                     if(entrada != -1) {
@@ -257,7 +297,34 @@ public class Main {
                     System.out.print("\nAperte enter para voltar");
                     input.nextLine();
                 }
-                case "3" -> System.out.println("\nTchauzim!"); // Encerra o programa
+
+                // Entrega 02
+                case "3" -> {
+                    System.out.println("\n\n**********CALCULAR CAMINHO MINIMO**********");
+
+                    System.out.println("\nDigite o código da cidade de origem (1 a " + grafo.getVertices().size() + "):");
+                    System.out.print("-> ");
+                    // Verifica se o valor digitado eh uma entrada valida
+                    entrada = checaEntrada(grafo, input);
+
+                    if (entrada != -1) {
+                        System.out.println("\nDigite o código da cidade de destino (1 a " + grafo.getVertices().size() + "):");
+                        System.out.print("-> ");
+                        // Verifica se o valor digitado eh uma entrada valida
+                        entradaDestino = checaEntrada(grafo, input);
+
+                        if (entradaDestino != -1) {
+                            imprimeCaminhoMinimo(grafo, entrada, entradaDestino);
+                        }
+                    }
+
+                    input = new Scanner(System.in);
+                    System.out.print("\nAperte enter para voltar");
+                    input.nextLine();
+                }
+
+                // Alterada a opcao de '3' para '0', para incluir as novas funcionalidades no menu
+                case "0" -> System.out.println("\nTchauzim!"); // Encerra o programa
             }
         }
     }

@@ -46,23 +46,28 @@ public class Grafo<T> {
         return null;
     }
 
+    private boolean checaVerticeExiste(T valor) {
+        // Busco o vertice pelo valor de entrada
+        Vertice<T> vertice = obterVertice(valor);
+
+        if (vertice == null) {
+            return false;
+        }
+
+        return true;
+    }
+
     // Metodo para adicionar uma aresta com peso a um dos vertices do grafo
     public void adicionarArestaComPeso(T origem, T destino, float peso) {
-        Vertice<T> verticeOrigem, verticeDestino;
-
-        // Busco o vertice com o valor de origem
-        verticeOrigem = obterVertice(origem);
+        Vertice<T> verticeOrigem = new Vertice<>(), verticeDestino = new Vertice<>();
 
         // Se ainda nao existe vertice com o valor da origem, vou criar o vertice
-        if(verticeOrigem == null) {
+        if(!checaVerticeExiste(origem)) {
             verticeOrigem = adicionarVertice(origem);
         }
 
-        // Busco o vertice com o valor de destino
-        verticeDestino = obterVertice(destino);
-
         // Se ainda nao existe vertice com o valor do destino, vou criar o vertice
-        if(verticeDestino == null) {
+        if(!checaVerticeExiste(destino)) {
             verticeDestino = adicionarVertice(destino);
         }
 
@@ -72,25 +77,27 @@ public class Grafo<T> {
 
     // Metodo para adicionar uma aresta sem peso a um dos vertices do grafo
     public void adicionarArestaSemPeso(T origem, T destino) {
-        Vertice<T> verticeOrigem, verticeDestino;
-
-        // Busco o vertice com o valor de origem
-        verticeOrigem = obterVertice(origem);
+        Vertice<T> verticeOrigem = new Vertice<>(), verticeDestino = new Vertice<>();
 
         // Se ainda nao existe vertice com o valor da origem, vou criar o vertice
-        if(verticeOrigem == null) {
+        if(!checaVerticeExiste(origem)) {
             verticeOrigem = adicionarVertice(origem);
         }
 
-        // Busco o vertice com o valor de destino
-        verticeDestino = obterVertice(destino);
-
         // Se ainda nao existe vertice com o valor do destino, vou criar o vertice
-        if(verticeDestino == null) {
+        if(!checaVerticeExiste(destino)) {
             verticeDestino = adicionarVertice(destino);
         }
 
         // Vou adicionar a aresta sem peso a lista de adjacencia do vertice de origem
         verticeOrigem.adicionarDestino(new Aresta<>(verticeDestino));
+    }
+
+    public ArrayList<Vertice<T>> calculaCaminhoMinimo(Vertice<T> origem, Vertice<T> destino) {
+        ArrayList<Vertice<T>> caminho = new ArrayList<>();
+
+
+
+        return caminho;
     }
 }
