@@ -1,6 +1,7 @@
 package listadeadjacencias;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Grafo<T> {
     // O grafo eh formado por uma lista de vertices (cidades, nesse caso)
@@ -94,10 +95,92 @@ public class Grafo<T> {
     }
 
     public ArrayList<Vertice<T>> calculaCaminhoMinimo(Vertice<T> origem, Vertice<T> destino) {
-        ArrayList<Vertice<T>> caminho = new ArrayList<>();
+        int quantidadeVertices = this.vertices.size();
+        float distancias[] = new float[quantidadeVertices];
+
+        ArrayList<Vertice<T>> predecessores = new ArrayList<>();
+        Vertice<T> ultimoNoRotulado = origem;
+
+        ArrayList<Vertice<T>> fila = new ArrayList<>();
+        ArrayList<Vertice<T>> marcados = new ArrayList<>();
+
+        float distanciaAtual = Float.POSITIVE_INFINITY;
+
+        // Distancias infinitas para os que nao tiverem caminho a partir do vertice de origem
+        for (int posicao = 0; posicao < quantidadeVertices; posicao++) {
+            Vertice<T> verticeP = new Vertice<>();
+
+            if (origem.getDestinos().get(posicao).getPeso() > 0) {
+                float distanciaPred = distanciaAtual;
+                distanciaAtual = origem.getDestinos().get(posicao).getPeso();
+
+                distancias[posicao] = origem.getDestinos().get(posicao).getPeso();
+                predecessores.add(posicao, origem);
+
+                ultimoNoRotulado = origem.getDestinos().get(posicao).getDestino();
+                if (distanciaAtual < distanciaPred) {
+                    fila.add(0, ultimoNoRotulado);
+                } else {
+                    fila.add(1, ultimoNoRotulado);
+                    distanciaAtual = distanciaPred;
+                }
+            } else {
+                distancias[posicao] = Float.POSITIVE_INFINITY;
+                verticeP.setValor((T) "null");
+                predecessores.add(posicao, verticeP);
+            }
+        }
+        distancias[this.vertices.indexOf(origem)] = 0; // menor distancia do no de origem eh 0
 
 
+        for (int i = 0; i < fila.size(); i++) {
+            System.out.println(Arrays.deepToString((Object[]) fila.get(i).getValor()));
+        }
 
-        return caminho;
+        ultimoNoRotulado = fila.get(0);
+        marcados.add(origem);
+        marcados.add(ultimoNoRotulado);
+
+        // Proximas iteracoes
+        while (ultimoNoRotulado != destino) {
+            System.out.println("-- " + Arrays.deepToString((Object[]) ultimoNoRotulado.getValor()));
+            distanciaAtual = Float.POSITIVE_INFINITY;
+            for (int posicao = 0; posicao < quantidadeVertices; posicao++) {
+                if (ultimoNoRotulado.getDestinos().get(posicao).getPeso() > 0 && !marcados.contains(ultimoNoRotulado.getDestinos().get(posicao).getDestino())) {
+                    float distanciaPred = distanciaAtual;
+                    distanciaAtual = distancias[this.vertices.indexOf(ultimoNoRotulado)] + ultimoNoRotulado.getDestinos().get(posicao).getPeso();
+                    float distAntiga = distancias[posicao];
+
+                    // System.out.println(distanciaAtual + ", " + distanciaPred);
+
+                    if (distanciaAtual < distAntiga) {
+                        distancias[posicao] = distanciaAtual;
+                        predecessores.set(posicao, ultimoNoRotulado);
+
+                        // System.out.println(distanciaAtual + ", " + distAntiga);
+                        // System.out.println("- " + Arrays.deepToString((Object[]) predecessores.get(posicao).getValor()));
+                    }
+
+                    if (distanciaAtual < distanciaPred) {
+                        fila.add(0, ultimoNoRotulado.getDestinos().get(posicao).getDestino());
+                        // System.out.println("- " + Arrays.deepToString((Object[]) ultimoNoRotulado.getDestinos().get(posicao).getDestino().getValor()));
+                    } else {
+                        fila.add(1, ultimoNoRotulado.getDestinos().get(posicao).getDestino());
+                        distanciaAtual = distanciaPred;
+                    }
+
+                    // System.out.println(Arrays.deepToString((Object[]) ultimoNoRotulado.getDestinos().get(posicao).getDestino().getValor()));
+                }
+            }
+            fila.remove(ultimoNoRotulado);
+            ultimoNoRotulado = fila.get(0);
+            if (!marcados.contains(ultimoNoRotulado)) {
+                marcados.add(ultimoNoRotulado);
+            }
+        }
+        predecessores.set(0, origem);
+
+
+        return marcados;
     }
 }

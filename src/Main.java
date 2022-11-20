@@ -31,7 +31,8 @@ public class Main {
 
             for (int contador = 0; contador < caminho.size(); contador++) {
                 if (contador > 0) {
-                    caminhoTotal += caminho.get(contador).getDestinos().get(contador - 1).getPeso();
+                    caminhoTotal += caminho.get(contador).getDestinos().get(grafo.getVertices().indexOf(caminho.get(contador - 1))).getPeso();
+                    // System.out.println("- " + caminho.get(contador).getDestinos().get(grafo.getVertices().indexOf(caminho.get(contador - 1))).getPeso());
                 }
 
                 if (contador != caminho.size() - 1) {
@@ -41,7 +42,7 @@ public class Main {
                     System.out.print(Arrays.deepToString(caminho.get(contador).getValor()));
                 }
             }
-            System.out.println("\nDistância total entre as cidades: " + caminhoTotal);
+            System.out.println("\nDistância mínima percorrida: " + caminhoTotal);
         }
         else {
             System.out.println("Não foi possível realizar a operação entre os valores requisitados.");
@@ -338,7 +339,7 @@ public class Main {
 
         GeradorArquivosGrafo g = new GeradorArquivosGrafo(); // Instancia um gerador de arquivos
         String nomeArquivoEntrada; // Cria variavel que vai ter o nome do arquivo gerado
-        int quantCidades = 10; // Variavel para definir a quantidade de cidade que serao criadas no arquivo
+        int quantCidades = 6; // Variavel para definir a quantidade de cidade que serao criadas no arquivo
 
         // Gera um arquivo com a quantidade definida de cidades
         // Passa o nome do arquivo gerado para a variavel
