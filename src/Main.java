@@ -32,6 +32,7 @@ public class Main {
                 // Os vertices do caminho minimo serao recebido na variavel caminho
                 caminho = grafo.calculaCaminhoMinimo(cidadeO, cidadeD);
             }
+            // Se nao for, adiciona preenche a variavel caminho com o mesmo valor para manter o padrao de impressao
             else {
                 caminho.add(cidadeO);
                 caminho.add(cidadeD);
@@ -251,22 +252,23 @@ public class Main {
 
     // Metodo para garantir que o codigo entrado pelo usuario eh um valor valido para leitura do grafo
     private static int checaEntrada (Grafo<String[]> grafo, Scanner input) {
-        int entradaOk = -1;
+        int entradaOk = -1; // Em -1 eh considerada uma entrada invalida
 
         // Se o valor de entrada for um numero
         if (input.hasNext("\\d+")) {
-            entradaOk = input.nextInt(); // Nao eh maior, pode chamar o metodo escolhido
+            entradaOk = input.nextInt(); // Pega o valor inteiro digitado pelo usuario
 
             if (entradaOk > grafo.getVertices().size()) { // Se o numero for maior que a quantidade de cidades
                 System.out.println("\nA cidade com esse código não consta no arquivo.");
                 entradaOk = -1;
             }
         }
+        // Se nao for um numero
         else {
             System.out.println("\nO código deve ser um número entre 1 e " + grafo.getVertices().size() + ".");
         }
 
-        return entradaOk; // Retorna o codigo do usuario se estiver ok, e -1 se for um codigo invalido
+        return entradaOk; // Retorna o codigo digitado pelo usuario se estiver ok ou -1 se for um codigo invalido
     }
 
     // Menu de opcoes do usuario
@@ -275,7 +277,7 @@ public class Main {
         String opcao = ""; // Variavel que vai guiar as opcoes do menu
 
         int entrada; // Vai receber a entrada do usuario de codigo da cidade
-        int entradaDestino;
+        int entradaDestino; // Vai receber a entrada do usuario de codigo da cidade de destino na opcao 3 do menu
 
         // O menu com as opcoes vai rodar enquanto o usuario nao escolher umas das 3 opcoes disponiveis
         while (!opcao.equals("0")) {
@@ -283,8 +285,8 @@ public class Main {
             System.out.println("     ESCOLHA A OPÇÃO");
             System.out.println("\n --- 1: OBTER TODAS AS CIDADES VIZINHAS");
             System.out.println(" --- 2: OBTER TODOS OS CAMINHOS DA CIDADE");
-            System.out.println(" --- 3: CALCULAR CAMINHO MINIMO");
-            System.out.println("\n --- 0: SAIR");
+            System.out.println(" --- 3: CALCULAR CAMINHO MINIMO"); // Entrega 2 do trabalho
+            System.out.println("\n --- 0: SAIR"); // Na entrega anterior, SAIR era a opcao 3, para manter um padrao nas proximas entregas, SAIR foi alterado para 0
             System.out.println("\n*******************************************\n");
             System.out.print("-> ");
             opcao = input.next();
@@ -324,20 +326,20 @@ public class Main {
                     input.nextLine();
                 }
 
-                // Entrega 02
+                // Entrega 2
                 case "3" -> {
                     System.out.println("\n\n**********CALCULAR CAMINHO MINIMO**********");
 
                     System.out.println("\nDigite o código da cidade de origem (1 a " + grafo.getVertices().size() + "):");
                     System.out.print("-> ");
-                    // Verifica se o valor digitado eh uma entrada valida
+                    // Verifica se o valor digitado para o vertice de origem eh uma entrada valida
                     entrada = checaEntrada(grafo, input);
 
                     // ...Se for
                     if (entrada != -1) {
                         System.out.println("\nDigite o código da cidade de destino (1 a " + grafo.getVertices().size() + "):");
                         System.out.print("-> ");
-                        // Verifica se o valor digitado eh uma entrada valida
+                        // Verifica se o valor digitado para o vertice de destino eh uma entrada valida
                         entradaDestino = checaEntrada(grafo, input);
 
                         // ...Se for, chama o metodo para calcula e imprimir o caminho minimo
@@ -376,14 +378,16 @@ public class Main {
 
         // Le o arquivo gerado
         grafo = abreArquivo(nomeArquivoEntrada); // O grafo vai receber os valores do arquivo a partir desse metodo
+
         // O arquivo de 6 entradas utilizado aqui foi criado manualmente, com base no grafo nao direcionado
         // do slide da UFMA encontrado no link abaixo
         // http://www.deinf.ufma.br/~portela/ed211_Dijkstra.pdf
-        // Como dito na 1a entrega, as modificacoes feitas no Gerador de Arquivos, impedem que seja criado mais de um
+
+        // Como dito na 1a entrega, as modificacoes feitas no Gerador de Arquivos impedem que seja criado mais de um
         // arquivo com mesmo nome (que eh nomeado pela quantidade de entradas) dentro da pasta _entrada_registros,
-        // por isso usar quantCidades = 6 aqui, colocando o arquivo criado manualmente com o nome seguindo o padrao
+        // por isso usar quantCidades = 6 aqui, colocando o arquivo criado manualmente com o nome seguindo esse padrao
         // dentro da pasta, permite a leitura dele sem sua substituicao
-        // Posteriormente foram feitos testes, e consequentemente ajustos, com o arquivo10, que ja eh um arquivo gerado pelo programa
+        // Posteriormente foram feitos testes, e consequentemente ajustes, com o arquivo10, que ja eh um arquivo gerado pelo programa
 
 
         // Imprime as cidades que foram colocadas no grafo conforme o arquivo de entrada
