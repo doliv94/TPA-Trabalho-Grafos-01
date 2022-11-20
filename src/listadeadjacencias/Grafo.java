@@ -47,6 +47,8 @@ public class Grafo<T> {
         return null;
     }
 
+    // Metodo para checar se existe com o valor entrado
+    // Esse metodo foi criado por ser feita a checagem nos dois metodos de adicionarAresta
     private boolean checaVerticeExiste(T valor) {
         // Busco o vertice pelo valor de entrada
         Vertice<T> vertice = obterVertice(valor);
@@ -94,93 +96,103 @@ public class Grafo<T> {
         verticeOrigem.adicionarDestino(new Aresta<>(verticeDestino));
     }
 
+    // Metodo para calcular o caminho minimo entre dois vertices
     public ArrayList<Vertice<T>> calculaCaminhoMinimo(Vertice<T> origem, Vertice<T> destino) {
-        int quantidadeVertices = this.vertices.size();
-        float distancias[] = new float[quantidadeVertices];
+        int quantidadeVertices = this.vertices.size(); // Pega a quantidade de vertices do grafo
+        float distancias[] = new float[quantidadeVertices]; // Cria uma variavel para guardar a distancia minima de cada vertice segundo a posicao dele no grafo
 
+        // Cria uma lista para guardar os vertices predecessores de cada ultimoNoRotulado, seguindo a explicacao do slide disponibilizado no ava
         ArrayList<Vertice<T>> predecessores = new ArrayList<>();
-        Vertice<T> ultimoNoRotulado = origem;
+        Vertice<T> ultimoNoRotulado = origem; // Define o ultimoNoRotulado como o vertice de origem
 
+        // Cria uma lista para colocar os vertices que sao destino do vertice atual, e ainda nao foram visitados
         ArrayList<Vertice<T>> fila = new ArrayList<>();
+        // Cria uma lista para colocar os vertices que fazem parte do caminho minimo
         ArrayList<Vertice<T>> marcados = new ArrayList<>();
 
-        float distanciaAtual = Float.POSITIVE_INFINITY;
+        float distanciaAtual = Float.POSITIVE_INFINITY; // Define uma variavel distanciaAtual como infinita
+        float distanciaPred; // Variavel que vai guardar a distancia anterior entre dois vertices
 
-        // Distancias infinitas para os que nao tiverem caminho a partir do vertice de origem
+        // Realiza a primeira iteracao para o vertice de origem
         for (int posicao = 0; posicao < quantidadeVertices; posicao++) {
-            Vertice<T> verticeP = new Vertice<>();
+            Vertice<T> verticeP = new Vertice<>(); // Cria um vertice vazio
 
+            // ...Se tem caminho a partir do vertice de origem
             if (origem.getDestinos().get(posicao).getPeso() > 0) {
-                float distanciaPred = distanciaAtual;
-                distanciaAtual = origem.getDestinos().get(posicao).getPeso();
+                distanciaPred = distanciaAtual; // Guarda a ultima distancia a partir do vertice de origem
+                distanciaAtual = origem.getDestinos().get(posicao).getPeso(); // Define a distancia atual do vertice de origem para o proximo
 
-                distancias[posicao] = origem.getDestinos().get(posicao).getPeso();
-                predecessores.add(posicao, origem);
+                // Guarda a distancia atual ate o vertice na lista das distancias, segundo a posicao dele
+                distancias[posicao] = distanciaAtual;
+                predecessores.add(posicao, origem); // Adiciona o vertice de origem como atual predecessor do vertice que ele tem caminho
 
-                ultimoNoRotulado = origem.getDestinos().get(posicao).getDestino();
+                // ...Se a distancia entre a origem e o vertice atual for menor do que a distancia da origem pro vertice anterior
                 if (distanciaAtual < distanciaPred) {
-                    fila.add(0, ultimoNoRotulado);
+                    fila.add(0, origem.getDestinos().get(posicao).getDestino()); // Eh menor, coloca ele no comeco da fila
                 } else {
-                    fila.add(1, ultimoNoRotulado);
-                    distanciaAtual = distanciaPred;
+                    fila.add(origem.getDestinos().get(posicao).getDestino()); // Nao eh menor, coloca ele no final da fila
+                    distanciaAtual = distanciaPred; // Define a distancia atual como a distancia anterior, que eh menor
                 }
-            } else {
-                distancias[posicao] = Float.POSITIVE_INFINITY;
-                verticeP.setValor((T) "null");
-                predecessores.add(posicao, verticeP);
+            }
+            // ...Se nao tem caminho da origem pro vertice atual
+            else {
+                distancias[posicao] = Float.POSITIVE_INFINITY; // A distancia eh definida como infinita
+                predecessores.add(posicao, verticeP); // Define o predecessor do vertice sem caminho como o vertice nulo
             }
         }
-        distancias[this.vertices.indexOf(origem)] = 0; // menor distancia do no de origem eh 0
+        distancias[this.vertices.indexOf(origem)] = 0; // Coloca a distancia do no de origem para ele mesmo como 0
 
+        ultimoNoRotulado = fila.get(0); // O ultimo no rotulado eh o primeiro da fila, que teve o menor caminho
+        marcados.add(origem); // Adiciona o vertice de origem na lista dos marcados
+        marcados.add(ultimoNoRotulado); // E adiciona o ultimo no rotulado na lista dos marcados tambem, porque estamos nele
 
-        for (int i = 0; i < fila.size(); i++) {
-            System.out.println(Arrays.deepToString((Object[]) fila.get(i).getValor()));
-        }
-
-        ultimoNoRotulado = fila.get(0);
-        marcados.add(origem);
-        marcados.add(ultimoNoRotulado);
-
-        // Proximas iteracoes
+        // Proximas iteracoes, agora que a base foi feita pelo vertice de origem, seguimos para os outros
+        // ...Enquanto o ultimo no rotulado nao for o no de destino
         while (ultimoNoRotulado != destino) {
-            System.out.println("-- " + Arrays.deepToString((Object[]) ultimoNoRotulado.getValor()));
+            // Sempre que partirmos de um vertice novo para comparacao, a distancia atual eh definida como infinito
             distanciaAtual = Float.POSITIVE_INFINITY;
+
+            // Vai passar por todos os destinos do vertice marcado atualmente
             for (int posicao = 0; posicao < quantidadeVertices; posicao++) {
+
+                // ...Se houver caminho e o vertice nao tiver sido marcado ainda
                 if (ultimoNoRotulado.getDestinos().get(posicao).getPeso() > 0 && !marcados.contains(ultimoNoRotulado.getDestinos().get(posicao).getDestino())) {
-                    float distanciaPred = distanciaAtual;
+
+                    distanciaPred = distanciaAtual; // Como visto la em cima, distanciaPred garda a distancia anterior
+
+                    // Distancia atual soma a distancia que ja foi percorrida pelo ultimoNoRotulado com a distancia dele para o vertice atual
                     distanciaAtual = distancias[this.vertices.indexOf(ultimoNoRotulado)] + ultimoNoRotulado.getDestinos().get(posicao).getPeso();
-                    float distAntiga = distancias[posicao];
+                    float distAntiga = distancias[posicao]; // Pega o valor da distancia que ja tinha sido guardado para o vertice atual
 
-                    // System.out.println(distanciaAtual + ", " + distanciaPred);
-
+                    // ...Se a distancia atual para o vertice der um valor menor do que o valor que ele ja tinha guardado
                     if (distanciaAtual < distAntiga) {
-                        distancias[posicao] = distanciaAtual;
-                        predecessores.set(posicao, ultimoNoRotulado);
-
-                        // System.out.println(distanciaAtual + ", " + distAntiga);
-                        // System.out.println("- " + Arrays.deepToString((Object[]) predecessores.get(posicao).getValor()));
+                        distancias[posicao] = distanciaAtual; // Substitui a distancia dele pelo menor valor de agora
+                        predecessores.set(posicao, ultimoNoRotulado); // Atualiza o predecessor dele
                     }
 
+                    // ...Se a distancia atual for menor que a anterior
                     if (distanciaAtual < distanciaPred) {
-                        fila.add(0, ultimoNoRotulado.getDestinos().get(posicao).getDestino());
-                        // System.out.println("- " + Arrays.deepToString((Object[]) ultimoNoRotulado.getDestinos().get(posicao).getDestino().getValor()));
-                    } else {
-                        fila.add(1, ultimoNoRotulado.getDestinos().get(posicao).getDestino());
-                        distanciaAtual = distanciaPred;
+                        fila.add(0, ultimoNoRotulado.getDestinos().get(posicao).getDestino()); // Poe o vertice no inicio da fila
                     }
-
-                    // System.out.println(Arrays.deepToString((Object[]) ultimoNoRotulado.getDestinos().get(posicao).getDestino().getValor()));
+                    else {
+                        fila.add(1, ultimoNoRotulado.getDestinos().get(posicao).getDestino()); // Se nao, por o vertice depois na fila
+                        distanciaAtual = distanciaPred; // E modifica a distancia atual para o valor anterior que era menor
+                    }
                 }
             }
+            // Quando acaba de passar pelos destinos possiveis do vertice, remove o ultimoNoRotulado da fila
             fila.remove(ultimoNoRotulado);
+            // E marca como ultimo no rotulado o primeiro da fila
             ultimoNoRotulado = fila.get(0);
+
+            // ...Se ele nao estiver na lista de marcados, adiciona
             if (!marcados.contains(ultimoNoRotulado)) {
                 marcados.add(ultimoNoRotulado);
             }
         }
-        predecessores.set(0, origem);
+        predecessores.set(0, origem); // No final de tudo, coloca o vertice de origem como predecessor dele mesmo
 
-
+        // Retorna a lista com todos os vertices que resultaram no menor caminho da origem ate o destino
         return marcados;
     }
 }

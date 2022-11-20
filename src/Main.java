@@ -1,4 +1,4 @@
-// TPA - 1a Etapa do Trabalho Prático de Grafos - prof. Victorio Carvalho
+// TPA - 2a Etapa do Trabalho Prático de Grafos - prof. Victorio Carvalho
 // Ifes Serra 2022/2
 // Dupla: Brunna Dalzini e Rafaela Amorim Pessim
 
@@ -13,28 +13,52 @@ import listadeadjacencias.*;
 
 public class Main {
 
+    // Metodo chamado para obter e imprimir o caminho minimo entre dois vertices
     private static void imprimeCaminhoMinimo(Grafo<String[]> grafo, int cidadeOrigem, int cidadeDestino) {
-        ArrayList<Vertice<String[]>> caminho = new ArrayList<>();
-        Vertice<String[]> cidadeO = grafo.getVertices().get(cidadeOrigem - 1);
-        Vertice<String[]> cidadeD = grafo.getVertices().get(cidadeDestino - 1);
+        ArrayList<Vertice<String[]>> caminho = new ArrayList<>(); // Lista de vertices que vai receber o resultado do caminho minimo
+        Vertice<String[]> cidadeO = grafo.getVertices().get(cidadeOrigem - 1); // Pega o vertice da cidade de origem de acordo com o codigo de entrada
+        Vertice<String[]> cidadeD = grafo.getVertices().get(cidadeDestino - 1); // Pega o vertice da cidade de destino de acordo com o codigo de entrada
 
-        float caminhoTotal = 0;
+        float caminhoTotal = 0; // Variavel que ira guardar a distancia total percorrida no caminho minimo
 
+        // ...Se os vertices das duas cidades existirem e nao forem nulos
         if(cidadeO != null && cidadeD != null) {
             System.out.println("\nCidade de Origem: " + Arrays.deepToString(cidadeO.getValor()));
             System.out.println("Cidade de Destino: " + Arrays.deepToString(cidadeD.getValor()));
 
-            caminho = grafo.calculaCaminhoMinimo(cidadeO, cidadeD);
+            // ...Se a cidade de origem for diferente da cidade de destino
+            if (cidadeO != cidadeD) {
+                // Chama o metodo do grafo que calcula o caminho minimo, passando como parametro os vertices de origem e de destino
+                // Os vertices do caminho minimo serao recebido na variavel caminho
+                caminho = grafo.calculaCaminhoMinimo(cidadeO, cidadeD);
+            }
+            else {
+                caminho.add(cidadeO);
+                caminho.add(cidadeD);
+            }
 
             System.out.println("\n---");
             System.out.println("\nCaminho Mínimo - Dijkstra:");
 
+            // Imprime o resultado
             for (int contador = 0; contador < caminho.size(); contador++) {
+                // Vai pegar a distancia entre dois vertices, o atual e o anterior, entao comeca a partir do segundo vertice guardado na variavel caminho
                 if (contador > 0) {
+                    // Ahahah ficou enorme isso que o caminhoTotal recebe, mas explicando parte a parte:
+
+                    // caminho.get(contador) -> pega o vertice atual na lista do caminho minimo
+                    // .getDestinos() -> olha quais os destinos desse vertice
+                    // .get -> e vai procurar o vertice que eh anterior ao atual na lista do caminho
+                    // (grafo -> para saber qual o index desse vertice anterior, vai entrar no grafo
+                    // .getVertices() -> e dai na lista dos vertices do grafo
+                    // .indexOf -> para pegar o index do vertice anterior, passando o proprio vertice na busca
+                    // (caminho.get(contador - 1))) -> e o vertice anterior eh o anterior ao atual na lista do caminho minimo
+                    // .getPeso() -> por fim, pega o valor da distancia entre o vertice atual e o anterior na lista do caminho minimo
+                    // E, claro, vai pegando essa distancia entre dois vertices e somando na variavel ate chegar ao ultimo par da lista
                     caminhoTotal += caminho.get(contador).getDestinos().get(grafo.getVertices().indexOf(caminho.get(contador - 1))).getPeso();
-                    // System.out.println("- " + caminho.get(contador).getDestinos().get(grafo.getVertices().indexOf(caminho.get(contador - 1))).getPeso());
                 }
 
+                // So para imprimir bonito, quando chegar no vertice destino, nao coloca ->
                 if (contador != caminho.size() - 1) {
                     System.out.print(Arrays.deepToString(caminho.get(contador).getValor()) + " -> ");
                 }
@@ -44,8 +68,9 @@ public class Main {
             }
             System.out.println("\nDistância mínima percorrida: " + caminhoTotal);
         }
+        // ...Se por algum motivo um dos vertices existir, mas seu valor for nulo
         else {
-            System.out.println("Não foi possível realizar a operação entre os valores requisitados.");
+            System.out.println("Não foi possível realizar a operação com os valores requisitados.");
         }
     }
 
@@ -308,17 +333,21 @@ public class Main {
                     // Verifica se o valor digitado eh uma entrada valida
                     entrada = checaEntrada(grafo, input);
 
+                    // ...Se for
                     if (entrada != -1) {
                         System.out.println("\nDigite o código da cidade de destino (1 a " + grafo.getVertices().size() + "):");
                         System.out.print("-> ");
                         // Verifica se o valor digitado eh uma entrada valida
                         entradaDestino = checaEntrada(grafo, input);
 
+                        // ...Se for, chama o metodo para calcula e imprimir o caminho minimo
                         if (entradaDestino != -1) {
                             imprimeCaminhoMinimo(grafo, entrada, entradaDestino);
                         }
                     }
 
+                    // Caso alguma entrada nao seja valida ou o metodo tenha sido realizado, o programa espera que o
+                    // usuario aperte enter e retorna para o menu de opcoes
                     input = new Scanner(System.in);
                     System.out.print("\nAperte enter para voltar");
                     input.nextLine();
@@ -347,6 +376,15 @@ public class Main {
 
         // Le o arquivo gerado
         grafo = abreArquivo(nomeArquivoEntrada); // O grafo vai receber os valores do arquivo a partir desse metodo
+        // O arquivo de 6 entradas utilizado aqui foi criado manualmente, com base no grafo nao direcionado
+        // do slide da UFMA encontrado no link abaixo
+        // http://www.deinf.ufma.br/~portela/ed211_Dijkstra.pdf
+        // Como dito na 1a entrega, as modificacoes feitas no Gerador de Arquivos, impedem que seja criado mais de um
+        // arquivo com mesmo nome (que eh nomeado pela quantidade de entradas) dentro da pasta _entrada_registros,
+        // por isso usar quantCidades = 6 aqui, colocando o arquivo criado manualmente com o nome seguindo o padrao
+        // dentro da pasta, permite a leitura dele sem sua substituicao
+        // Posteriormente foram feitos testes, e consequentemente ajustos, com o arquivo10, que ja eh um arquivo gerado pelo programa
+
 
         // Imprime as cidades que foram colocadas no grafo conforme o arquivo de entrada
         imprimeCidades(grafo);
