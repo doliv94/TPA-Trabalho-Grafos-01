@@ -1,4 +1,6 @@
-// TPA - 2a Etapa do Trabalho Prático de Grafos - prof. Victorio Carvalho
+// Nessa etapa do trabalho foi implementado o Algoritmo de Kruskal
+
+// TPA - 3a Etapa do Trabalho Prático de Grafos - prof. Victorio Carvalho
 // Ifes Serra 2022/2
 // Dupla: Brunna Dalzini e Rafaela Amorim Pessim
 
@@ -12,6 +14,13 @@ import listadeadjacencias.*;
 
 
 public class Main {
+
+    // Metodo que vai realizar a chamada para criacao da arvore geradora minima e em seguida imprimi-la
+    private static void imprimeArvoreGeradoraMinima(Grafo<String[]> grafo) {
+        Grafo<String[]> arvoreGeradoraMinima = new Grafo<>();
+
+        arvoreGeradoraMinima = grafo.calculaArvoreGeradoraMinima(grafo);
+    }
 
     // Metodo chamado para obter e imprimir o caminho minimo entre dois vertices
     private static void imprimeCaminhoMinimo(Grafo<String[]> grafo, int cidadeOrigem, int cidadeDestino) {
@@ -286,6 +295,7 @@ public class Main {
             System.out.println("\n --- 1: OBTER TODAS AS CIDADES VIZINHAS");
             System.out.println(" --- 2: OBTER TODOS OS CAMINHOS DA CIDADE");
             System.out.println(" --- 3: CALCULAR CAMINHO MINIMO"); // Entrega 2 do trabalho
+            System.out.println(" --- 4: CALCULAR ÁRVORE GERADORA MÍNIMA"); // Entrega 3 do trabalho
             System.out.println("\n --- 0: SAIR"); // Na entrega anterior, SAIR era a opcao 3, para manter um padrao nas proximas entregas, SAIR foi alterado para 0
             System.out.println("\n*******************************************\n");
             System.out.print("-> ");
@@ -355,6 +365,17 @@ public class Main {
                     input.nextLine();
                 }
 
+                // Entrega 3
+                case "4" -> {
+                    System.out.println("\n\n******CALCULAR ÁRVORE GERADORA MÍNIMA******");
+
+                    imprimeArvoreGeradoraMinima(grafo); // Chama o metodo para gerar e imprimir a arvore geradora minima
+
+                    input = new Scanner(System.in);
+                    System.out.print("\nAperte enter para voltar");
+                    input.nextLine();
+                }
+
                 // Alterada a opcao de '3' para '0', para incluir as novas funcionalidades no menu
                 case "0" -> System.out.println("\nTchauzim!"); // Encerra o programa
             }
@@ -370,7 +391,7 @@ public class Main {
 
         GeradorArquivosGrafo g = new GeradorArquivosGrafo(); // Instancia um gerador de arquivos
         String nomeArquivoEntrada; // Cria variavel que vai ter o nome do arquivo gerado
-        int quantCidades = 6; // Variavel para definir a quantidade de cidade que serao criadas no arquivo
+        int quantCidades = 9; // Variavel para definir a quantidade de cidade que serao criadas no arquivo
 
         // Gera um arquivo com a quantidade definida de cidades
         // Passa o nome do arquivo gerado para a variavel
@@ -379,13 +400,12 @@ public class Main {
         // Le o arquivo gerado
         grafo = abreArquivo(nomeArquivoEntrada); // O grafo vai receber os valores do arquivo a partir desse metodo
 
-        // O arquivo de 6 entradas utilizado aqui foi criado manualmente, com base no grafo nao direcionado
-        // do slide da UFMA encontrado no link abaixo
-        // http://www.deinf.ufma.br/~portela/ed211_Dijkstra.pdf
+        // O arquivo de 9 entradas utilizado aqui foi criado manualmente, com base no grafo do exemplo do algoritmo
+        // de kruskal disponibilizado no slide do ava
 
-        // Como dito na 1a entrega, as modificacoes feitas no Gerador de Arquivos impedem que seja criado mais de um
+        // Como dito em entregas anteriores, as modificacoes feitas no Gerador de Arquivos impedem que seja criado mais de um
         // arquivo com mesmo nome (que eh nomeado pela quantidade de entradas) dentro da pasta _entrada_registros,
-        // por isso usar quantCidades = 6 aqui, colocando o arquivo criado manualmente com o nome seguindo esse padrao
+        // por isso usar quantCidades = 9 aqui, colocando o arquivo criado manualmente com o nome seguindo esse padrao
         // dentro da pasta, permite a leitura dele sem sua substituicao
         // Posteriormente foram feitos testes, e consequentemente ajustes, com o arquivo10, que ja eh um arquivo gerado pelo programa
 

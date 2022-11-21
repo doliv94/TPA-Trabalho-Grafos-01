@@ -213,4 +213,48 @@ public class Grafo<T> {
         // Retorna a lista com todos os vertices que resultaram no menor caminho da origem ate o destino
         return marcados;
     }
+
+    private boolean checaCiclo(Grafo<T> grafo) {
+
+    }
+
+    // Implementado o Algoritmo de Kruskal
+    // Metodo para construcao da arvore geradora minima
+    public Grafo<T> calculaArvoreGeradoraMinima (Grafo<T> grafo) {
+        Grafo<T> grafoAGM = new Grafo<>();
+        Float menorDistancia = Float.POSITIVE_INFINITY;
+
+        Vertice<T> novoVertice;
+        Aresta<T> novaAresta;
+        ArrayList<Aresta<T>> novaListaDestinos;
+
+        ArrayList<Vertice<T>> fila = new ArrayList<>();
+
+        for (int vertice = 0; vertice < grafo.getVertices().size(); vertice++) {
+            Vertice<T> partida = grafo.getVertices().get(vertice);
+
+            for (int dest = 0; dest < grafo.getVertices().get(vertice).getDestinos().size(); dest++) {
+                if (partida.getDestinos().get(dest).getPeso() > 0) {
+                    novoVertice = new Vertice<>();
+                    novaAresta = new Aresta<>();
+                    novaListaDestinos = new ArrayList<>();
+
+                    novaAresta.setDestino(partida.getDestinos().get(dest).getDestino());
+                    menorDistancia = novaAresta.getPeso();
+                    novaAresta.setPeso(menorDistancia);
+
+                    novaListaDestinos.add(novaAresta);
+
+                    novoVertice.setValor(partida.getValor());
+                    novoVertice.setDestinos(novaListaDestinos);
+                }
+            }
+        }
+        fila.add();
+
+        // procura peso menor -> checa se ele faz ciclo -> adiciona ou nao -> repete processo
+
+
+        return grafoAGM;
+    }
 }
