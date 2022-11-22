@@ -216,41 +216,64 @@ public class Grafo<T> {
 
     private boolean checaCiclo(Grafo<T> grafo) {
 
+
+        return true;
     }
 
     // Implementado o Algoritmo de Kruskal
     // Metodo para construcao da arvore geradora minima
     public Grafo<T> calculaArvoreGeradoraMinima (Grafo<T> grafo) {
         Grafo<T> grafoAGM = new Grafo<>();
-        Float menorDistancia = Float.POSITIVE_INFINITY;
+        Float menorDistancia;
 
-        Vertice<T> novoVertice;
-        Aresta<T> novaAresta;
+        Vertice<T> novoVertice = new Vertice<>();
+        Vertice<T> novoDestino = new Vertice<>();
+
+        Aresta<T> novaAresta = new Aresta<>();
         ArrayList<Aresta<T>> novaListaDestinos;
 
-        ArrayList<Vertice<T>> fila = new ArrayList<>();
+        ArrayList<Vertice<T>> fila = grafo.getVertices();
 
-        for (int vertice = 0; vertice < grafo.getVertices().size(); vertice++) {
-            Vertice<T> partida = grafo.getVertices().get(vertice);
+        Vertice<T> partida;
 
-            for (int dest = 0; dest < grafo.getVertices().get(vertice).getDestinos().size(); dest++) {
-                if (partida.getDestinos().get(dest).getPeso() > 0) {
-                    novoVertice = new Vertice<>();
-                    novaAresta = new Aresta<>();
-                    novaListaDestinos = new ArrayList<>();
+        // Adiciona as duas primeiras arestas
+        for (int i = 0; i < 2; i++) {
+            menorDistancia = Float.POSITIVE_INFINITY;
 
-                    novaAresta.setDestino(partida.getDestinos().get(dest).getDestino());
-                    menorDistancia = novaAresta.getPeso();
-                    novaAresta.setPeso(menorDistancia);
+            for (int vertice = 0; vertice < fila.size(); vertice++) {
+                partida = fila.get(vertice);
 
-                    novaListaDestinos.add(novaAresta);
+                for (int dest = 0; dest < fila.get(vertice).getDestinos().size(); dest++) {
+                    if (partida.getDestinos().get(dest).getPeso() > 0) {
 
-                    novoVertice.setValor(partida.getValor());
-                    novoVertice.setDestinos(novaListaDestinos);
+                        if (partida.getDestinos().get(dest).getPeso() < menorDistancia) {
+                            // grafoAGM.adicionarArestaComPeso(partida.getValor(), partida.getDestinos().get(dest).getDestino().getValor(), partida.getDestinos().get(dest).getPeso());
+
+                            novoDestino = partida.getDestinos().get(dest).getDestino();
+                            novaAresta.setDestino(novoDestino);
+
+                            menorDistancia = partida.getDestinos().get(dest).getPeso();
+                            novaAresta.setPeso(menorDistancia);
+
+                            novaListaDestinos = new ArrayList<>();
+                            novaListaDestinos.add(novaAresta);
+
+                            novoVertice.setValor(partida.getValor());
+                            novoVertice.setDestinos(novaListaDestinos);
+                        }
+                    }
                 }
             }
+            fila.remove(grafo.obterVertice(novoVertice.getValor()));
+            fila.remove(grafo.obterVertice(novoDestino.getValor()));
+
+            grafoAGM.adicionarArestaComPeso(novoVertice.getValor(), novoDestino.getValor(), menorDistancia);
+
+            System.out.println(menorDistancia);
+            System.out.println(Arrays.deepToString((Object[]) novoVertice.getValor()));
+            System.out.println(Arrays.deepToString((Object[]) novoDestino.getValor()));
         }
-        fila.add();
+
 
         // procura peso menor -> checa se ele faz ciclo -> adiciona ou nao -> repete processo
 
