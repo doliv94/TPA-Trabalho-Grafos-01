@@ -17,9 +17,10 @@ public class Main {
 
     // Metodo que vai realizar a chamada para criacao da arvore geradora minima e em seguida imprimi-la
     private static void imprimeArvoreGeradoraMinima(Grafo<String[]> grafo) {
-        Grafo<String[]> arvoreGeradoraMinima = new Grafo<>();
+        Grafo<String[]> grafoArvoreGeradoraMinima = new Grafo<>();
 
-        arvoreGeradoraMinima = grafo.calculaArvoreGeradoraMinima(grafo);
+        grafoArvoreGeradoraMinima = grafo.calculaArvoreGeradoraMinima(grafo);
+        imprimeCidades(grafoArvoreGeradoraMinima);
     }
 
     // Metodo chamado para obter e imprimir o caminho minimo entre dois vertices

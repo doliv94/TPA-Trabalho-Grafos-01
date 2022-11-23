@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 public class Grafo<T> {
     // O grafo eh formado por uma lista de vertices (cidades, nesse caso)
-    private ArrayList<Vertice<T>> vertices;
+    private ArrayList<Vertice<T>> vertices = new ArrayList<>(); // Inicializa lista
 
     // Pode criar um grafo vazio e depois acrescentar os vertices dele
     public Grafo() { }
@@ -214,10 +214,25 @@ public class Grafo<T> {
         return marcados;
     }
 
-    private boolean checaCiclo(Grafo<T> grafo) {
+    private boolean checaCiclo(Grafo<T> grafoAGM, Vertice<T> origem, Vertice<T> destino) {
+        Vertice<T> pred = origem;
 
+        for (Vertice<T> vertice: grafoAGM.getVertices()) {
+            if (origem.getDestinos().get(vertice).getPeso() > 0) {
+                origem = origem.getDestinos().get(vertice).getDestino();
 
-        return true;
+                if (origem != pred) {
+                    if (origem == destino || (checaCiclo(origem, destino))) {
+                        return true;
+                    }
+                }
+                else {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     // Implementado o Algoritmo de Kruskal
@@ -247,7 +262,6 @@ public class Grafo<T> {
                     if (partida.getDestinos().get(dest).getPeso() > 0) {
 
                         if (partida.getDestinos().get(dest).getPeso() < menorDistancia) {
-                            // grafoAGM.adicionarArestaComPeso(partida.getValor(), partida.getDestinos().get(dest).getDestino().getValor(), partida.getDestinos().get(dest).getPeso());
 
                             novoDestino = partida.getDestinos().get(dest).getDestino();
                             novaAresta.setDestino(novoDestino);
@@ -272,6 +286,39 @@ public class Grafo<T> {
             System.out.println(menorDistancia);
             System.out.println(Arrays.deepToString((Object[]) novoVertice.getValor()));
             System.out.println(Arrays.deepToString((Object[]) novoDestino.getValor()));
+        }
+
+        while (grafoAGM.getVertices().size() < grafo.getVertices().size()) {
+            menorDistancia = Float.POSITIVE_INFINITY;
+
+            for (int vertice = 0; vertice < grafo.getVertices().size(); vertice++) {
+                partida = grafo.getVertices().get(vertice);
+
+                for (int dest = 0; dest < grafo.getVertices().get(vertice).getDestinos().size(); dest++) {
+
+                    if (!(grafoAGM.getVertices().contains(partida) && grafoAGM.getVertices().get(grafoAGM.getVertices().indexOf(partida)).getDestinos().contains(partida.getDestinos().get(dest)))) {
+
+                        if (partida.getDestinos().get(dest).getPeso() > 0) {
+
+                            if (partida.getDestinos().get(dest).getPeso() < menorDistancia && !checaCiclo(grafoAGM, partida, partida.getDestinos().get(dest).getDestino())) {
+
+                                novoDestino = partida.getDestinos().get(dest).getDestino();
+                                novaAresta.setDestino(novoDestino);
+
+                                menorDistancia = partida.getDestinos().get(dest).getPeso();
+                                novaAresta.setPeso(menorDistancia);
+
+                                novaListaDestinos = new ArrayList<>();
+                                novaListaDestinos.add(novaAresta);
+
+                                novoVertice.setValor(partida.getValor());
+                                novoVertice.setDestinos(novaListaDestinos);
+                            }
+                        }
+                    }
+                }
+            }
+            grafoAGM.adicionarArestaComPeso(novoVertice.getValor(), novoDestino.getValor(), menorDistancia);
         }
 
 

@@ -9,7 +9,7 @@ public class Vertice<T> {
 
     // Lista de destinos, vai conter o vertice que representa
     // a cidade de destino e o peso da aresta (nesse caso, distancia ate a cidade)
-    private ArrayList<Aresta<T>> destinos;
+    private ArrayList<Aresta<T>> destinos = new ArrayList<>(); // Inicializa lista
 
     // Pode criar um vertice vazio para colocar os valores depois
     public Vertice(){ }
