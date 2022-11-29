@@ -2,6 +2,8 @@ package listadeadjacencias;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class Grafo<T> {
     // O grafo eh formado por uma lista de vertices (cidades, nesse caso)
@@ -29,6 +31,12 @@ public class Grafo<T> {
         this.vertices.add(novo);
 
         return novo;
+    }
+
+    public Vertice<T> adicionarVerticeComPeso(Vertice<T> vertice) {
+        this.vertices.add(vertice);
+
+        return vertice;
     }
 
     // Metodo para procurar/retornar um vertice especifico do grafo
@@ -214,19 +222,13 @@ public class Grafo<T> {
         return marcados;
     }
 
-    private boolean checaCiclo(Grafo<T> grafoAGM, Vertice<T> origem, Vertice<T> destino) {
-        Vertice<T> pred = origem;
+    private boolean checaCiclo(Grafo<T> grafoAGM, Vertice<T> origem) {
 
-        for (Vertice<T> vertice: grafoAGM.getVertices()) {
-            if (origem.getDestinos().get(vertice).getPeso() > 0) {
+        for (int vertice = 0; vertice < origem.getDestinos().size(); vertice++) {
+            if (origem.getDestinos().get(vertice).getPeso() > 0 ) {
                 origem = origem.getDestinos().get(vertice).getDestino();
 
-                if (origem != pred) {
-                    if (origem == destino || (checaCiclo(origem, destino))) {
-                        return true;
-                    }
-                }
-                else {
+                if (grafoAGM.getVertices().contains(origem)) {
                     return true;
                 }
             }
@@ -235,93 +237,50 @@ public class Grafo<T> {
         return false;
     }
 
+    private ArrayList<Aresta<T>> preencheDestinosVazios (Vertice<T> vertice) {
+        ArrayList<Aresta<T>> listaNula = new ArrayList<>();
+
+        for (Aresta<T> d: vertice.getDestinos()) {
+            d.setPeso(0.00f);
+            listaNula.add(d);
+        }
+
+        return listaNula;
+    }
+
     // Implementado o Algoritmo de Kruskal
     // Metodo para construcao da arvore geradora minima
     public Grafo<T> calculaArvoreGeradoraMinima (Grafo<T> grafo) {
         Grafo<T> grafoAGM = new Grafo<>();
-        Float menorDistancia;
+        Float menorDistancia = Float.POSITIVE_INFINITY;
 
-        Vertice<T> novoVertice = new Vertice<>();
-        Vertice<T> novoDestino = new Vertice<>();
+        ArrayList<Aresta<T>> listaDestinosOrdenada = new ArrayList<>();
+        Vertice<T> vertice = new Vertice<>();
 
-        Aresta<T> novaAresta = new Aresta<>();
-        ArrayList<Aresta<T>> novaListaDestinos;
+        ArrayList<Aresta<T>> novaListaDestinos = new ArrayList<>();
 
-        ArrayList<Vertice<T>> fila = grafo.getVertices();
-
-        Vertice<T> partida;
-
-        // Adiciona as duas primeiras arestas
-        for (int i = 0; i < 2; i++) {
+        for (Vertice<T> v: grafo.getVertices()) {
+            System.out.println(v.getDestinos().get(0).getPeso());
             menorDistancia = Float.POSITIVE_INFINITY;
 
-            for (int vertice = 0; vertice < fila.size(); vertice++) {
-                partida = fila.get(vertice);
+            novaListaDestinos = preencheDestinosVazios(v);
+            vertice.setDestinos(novaListaDestinos);
 
-                for (int dest = 0; dest < fila.get(vertice).getDestinos().size(); dest++) {
-                    if (partida.getDestinos().get(dest).getPeso() > 0) {
-
-                        if (partida.getDestinos().get(dest).getPeso() < menorDistancia) {
-
-                            novoDestino = partida.getDestinos().get(dest).getDestino();
-                            novaAresta.setDestino(novoDestino);
-
-                            menorDistancia = partida.getDestinos().get(dest).getPeso();
-                            novaAresta.setPeso(menorDistancia);
-
-                            novaListaDestinos = new ArrayList<>();
-                            novaListaDestinos.add(novaAresta);
-
-                            novoVertice.setValor(partida.getValor());
-                            novoVertice.setDestinos(novaListaDestinos);
-                        }
-                    }
+            for (Aresta<T> a: v.getDestinos()) {
+                System.out.println(a.getPeso());
+                if (a.getPeso() > 0 && a.getPeso() < menorDistancia) {
+                    menorDistancia = a.getPeso();
+                    vertice.setValor(v.getValor());
+                    vertice.getDestinos().get(grafo.getVertices().indexOf(v)).setPeso(menorDistancia);
                 }
             }
-            fila.remove(grafo.obterVertice(novoVertice.getValor()));
-            fila.remove(grafo.obterVertice(novoDestino.getValor()));
-
-            grafoAGM.adicionarArestaComPeso(novoVertice.getValor(), novoDestino.getValor(), menorDistancia);
-
-            System.out.println(menorDistancia);
-            System.out.println(Arrays.deepToString((Object[]) novoVertice.getValor()));
-            System.out.println(Arrays.deepToString((Object[]) novoDestino.getValor()));
         }
+        grafoAGM.adicionarVerticeComPeso(vertice);
 
-        while (grafoAGM.getVertices().size() < grafo.getVertices().size()) {
-            menorDistancia = Float.POSITIVE_INFINITY;
-
-            for (int vertice = 0; vertice < grafo.getVertices().size(); vertice++) {
-                partida = grafo.getVertices().get(vertice);
-
-                for (int dest = 0; dest < grafo.getVertices().get(vertice).getDestinos().size(); dest++) {
-
-                    if (!(grafoAGM.getVertices().contains(partida) && grafoAGM.getVertices().get(grafoAGM.getVertices().indexOf(partida)).getDestinos().contains(partida.getDestinos().get(dest)))) {
-
-                        if (partida.getDestinos().get(dest).getPeso() > 0) {
-
-                            if (partida.getDestinos().get(dest).getPeso() < menorDistancia && !checaCiclo(grafoAGM, partida, partida.getDestinos().get(dest).getDestino())) {
-
-                                novoDestino = partida.getDestinos().get(dest).getDestino();
-                                novaAresta.setDestino(novoDestino);
-
-                                menorDistancia = partida.getDestinos().get(dest).getPeso();
-                                novaAresta.setPeso(menorDistancia);
-
-                                novaListaDestinos = new ArrayList<>();
-                                novaListaDestinos.add(novaAresta);
-
-                                novoVertice.setValor(partida.getValor());
-                                novoVertice.setDestinos(novaListaDestinos);
-                            }
-                        }
-                    }
-                }
-            }
-            grafoAGM.adicionarArestaComPeso(novoVertice.getValor(), novoDestino.getValor(), menorDistancia);
-        }
+        System.out.println(Arrays.deepToString((Object[]) vertice.getValor()));
 
 
+        // a cada vertice fazer uma lista dos destinos com peso maior que 0, em ordem crescente
         // procura peso menor -> checa se ele faz ciclo -> adiciona ou nao -> repete processo
 
 

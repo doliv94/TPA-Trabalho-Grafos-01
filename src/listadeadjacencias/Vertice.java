@@ -45,4 +45,10 @@ public class Vertice<T> {
     public void adicionarDestino(Aresta<T> aresta) {
         this.destinos.add(aresta);
     }
+
+    public void removerDestino(Vertice<T> vertice) {
+        if (this.destinos.contains(vertice)) {
+            this.destinos.remove(this.destinos.get(this.destinos.indexOf(vertice)));
+        }
+    }
 }
