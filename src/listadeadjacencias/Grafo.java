@@ -238,14 +238,19 @@ public class Grafo<T> {
     }
 
     private ArrayList<Aresta<T>> preencheDestinosVazios (Vertice<T> vertice) {
-        ArrayList<Aresta<T>> listaNula = new ArrayList<>();
 
-        for (Aresta<T> d: vertice.getDestinos()) {
-            d.setPeso(0.00f);
-            listaNula.add(d);
+        ArrayList<Aresta<T>> novaListaDestinos = new ArrayList<>();
+        Aresta<T> novaAresta = new Aresta<>();
+
+        for (int i = 0; i < vertice.getDestinos().size(); i++) {
+            novaAresta.setDestino(vertice.getDestinos().get(i).getDestino());
+            novaAresta.setPeso(0.00f);
+
+            novaListaDestinos.add(novaAresta);
+            // System.out.println(Arrays.deepToString((Object[]) vertice.getValor()));
         }
 
-        return listaNula;
+        return novaListaDestinos;
     }
 
     // Implementado o Algoritmo de Kruskal
@@ -257,21 +262,23 @@ public class Grafo<T> {
         ArrayList<Aresta<T>> listaDestinosOrdenada = new ArrayList<>();
         Vertice<T> vertice = new Vertice<>();
 
-        ArrayList<Aresta<T>> novaListaDestinos = new ArrayList<>();
+        ArrayList<Aresta<T>> novaListaDestinos;
 
-        for (Vertice<T> v: grafo.getVertices()) {
-            System.out.println(v.getDestinos().get(0).getPeso());
-            menorDistancia = Float.POSITIVE_INFINITY;
+        menorDistancia = Float.POSITIVE_INFINITY;
+        for (int i = 0; i < grafo.getVertices().size(); i++) {
 
-            novaListaDestinos = preencheDestinosVazios(v);
-            vertice.setDestinos(novaListaDestinos);
+            for (int j = 0; j < grafo.getVertices().get(i).getDestinos().size(); j++) {
 
-            for (Aresta<T> a: v.getDestinos()) {
-                System.out.println(a.getPeso());
-                if (a.getPeso() > 0 && a.getPeso() < menorDistancia) {
-                    menorDistancia = a.getPeso();
-                    vertice.setValor(v.getValor());
-                    vertice.getDestinos().get(grafo.getVertices().indexOf(v)).setPeso(menorDistancia);
+                if (grafo.getVertices().get(i).getDestinos().get(j).getPeso() > 0 && grafo.getVertices().get(i).getDestinos().get(j).getPeso() < menorDistancia) {
+
+                    vertice.setValor(grafo.getVertices().get(i).getValor());
+                    vertice.setDestinos(grafo.getVertices().get(i).getDestinos());
+                    novaListaDestinos = preencheDestinosVazios(vertice);
+                    vertice.setDestinos(novaListaDestinos);
+
+                    menorDistancia = grafo.getVertices().get(i).getDestinos().get(j).getPeso();
+
+                    vertice.getDestinos().get(j).setPeso(menorDistancia);
                 }
             }
         }
