@@ -247,7 +247,6 @@ public class Grafo<T> {
             novaAresta.setPeso(0.00f);
 
             novaListaDestinos.add(novaAresta);
-            // System.out.println(Arrays.deepToString((Object[]) vertice.getValor()));
         }
 
         return novaListaDestinos;
@@ -261,31 +260,42 @@ public class Grafo<T> {
 
         ArrayList<Aresta<T>> listaDestinosOrdenada = new ArrayList<>();
         Vertice<T> vertice = new Vertice<>();
+        Vertice<T> verticeD = new Vertice<>();
 
         ArrayList<Aresta<T>> novaListaDestinos;
 
-        menorDistancia = Float.POSITIVE_INFINITY;
-        for (int i = 0; i < grafo.getVertices().size(); i++) {
+        while (grafoAGM.getVertices().size() != grafo.getVertices().size() || !menorDistancia.isInfinite()) {
+            menorDistancia = Float.POSITIVE_INFINITY;
 
-            for (int j = 0; j < grafo.getVertices().get(i).getDestinos().size(); j++) {
+            for (int i = 0; i < grafo.getVertices().size(); i++) {
 
-                if (grafo.getVertices().get(i).getDestinos().get(j).getPeso() > 0 && grafo.getVertices().get(i).getDestinos().get(j).getPeso() < menorDistancia) {
+                for (int j = 0; j < grafo.getVertices().get(i).getDestinos().size(); j++) {
 
-                    vertice.setValor(grafo.getVertices().get(i).getValor());
-                    vertice.setDestinos(grafo.getVertices().get(i).getDestinos());
-                    novaListaDestinos = preencheDestinosVazios(vertice);
-                    vertice.setDestinos(novaListaDestinos);
+                    if (grafo.getVertices().get(i).getDestinos().get(j).getPeso() > 0 && grafo.getVertices().get(i).getDestinos().get(j).getPeso() < menorDistancia) {
 
-                    menorDistancia = grafo.getVertices().get(i).getDestinos().get(j).getPeso();
+                        vertice.setValor(grafo.getVertices().get(i).getValor());
+                        vertice.setDestinos(grafo.getVertices().get(i).getDestinos());
+                        novaListaDestinos = preencheDestinosVazios(vertice);
+                        vertice.setDestinos(novaListaDestinos);
 
-                    vertice.getDestinos().get(j).setPeso(menorDistancia);
+                        menorDistancia = grafo.getVertices().get(i).getDestinos().get(j).getPeso();
+
+                        vertice.getDestinos().get(j).setPeso(menorDistancia);
+
+                        verticeD.setValor(vertice.getDestinos().get(j).getDestino().getValor());
+                        verticeD.setDestinos(vertice.getDestinos().get(j).getDestino().getDestinos());
+                        novaListaDestinos = preencheDestinosVazios(verticeD);
+                        verticeD.setDestinos(novaListaDestinos);
+
+                        verticeD.getDestinos().get(i).setPeso(menorDistancia);
+                    }
                 }
             }
+            grafoAGM.adicionarVerticeComPeso(vertice);
+            grafoAGM.adicionarVerticeComPeso(verticeD);
+
+            System.out.println(Arrays.deepToString((Object[]) vertice.getValor()));
         }
-        grafoAGM.adicionarVerticeComPeso(vertice);
-
-        System.out.println(Arrays.deepToString((Object[]) vertice.getValor()));
-
 
         // a cada vertice fazer uma lista dos destinos com peso maior que 0, em ordem crescente
         // procura peso menor -> checa se ele faz ciclo -> adiciona ou nao -> repete processo
