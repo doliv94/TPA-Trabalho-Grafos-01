@@ -268,6 +268,7 @@ public class Grafo<T> {
 
                 for (int j = 0; j < grafo.getVertices().get(i).getDestinos().size(); j++) {
 
+                    // acertar isso
                     if (grafoAGM.getVertices().size() == 0 || grafoAGM.obterVertice(grafo.getVertices().get(i).getValor()).getDestinos().get(j).getPeso() == 0) {
 
                         if (grafo.getVertices().get(i).getDestinos().get(j).getPeso() > 0 && grafo.getVertices().get(i).getDestinos().get(j).getPeso() < menorDistancia) {
