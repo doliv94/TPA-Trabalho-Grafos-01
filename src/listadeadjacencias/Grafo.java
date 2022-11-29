@@ -1,9 +1,6 @@
 package listadeadjacencias;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.*;
 
 public class Grafo<T> {
     // O grafo eh formado por uma lista de vertices (cidades, nesse caso)
@@ -256,7 +253,7 @@ public class Grafo<T> {
     // Metodo para construcao da arvore geradora minima
     public Grafo<T> calculaArvoreGeradoraMinima (Grafo<T> grafo) {
         Grafo<T> grafoAGM = new Grafo<>();
-        Float menorDistancia = Float.POSITIVE_INFINITY;
+        float menorDistancia = Float.POSITIVE_INFINITY;
 
         ArrayList<Aresta<T>> listaDestinosOrdenada = new ArrayList<>();
         Vertice<T> vertice = new Vertice<>();
@@ -264,35 +261,42 @@ public class Grafo<T> {
 
         ArrayList<Aresta<T>> novaListaDestinos;
 
-        while (grafoAGM.getVertices().size() != grafo.getVertices().size() || !menorDistancia.isInfinite()) {
+        while (grafoAGM.getVertices().size() != grafo.getVertices().size() || !Float.isInfinite(menorDistancia)) {
             menorDistancia = Float.POSITIVE_INFINITY;
 
             for (int i = 0; i < grafo.getVertices().size(); i++) {
 
                 for (int j = 0; j < grafo.getVertices().get(i).getDestinos().size(); j++) {
 
-                    if (grafo.getVertices().get(i).getDestinos().get(j).getPeso() > 0 && grafo.getVertices().get(i).getDestinos().get(j).getPeso() < menorDistancia) {
+                    if (grafoAGM.getVertices().size() == 0 || grafoAGM.obterVertice(grafo.getVertices().get(i).getValor()).getDestinos().get(j).getPeso() == 0) {
 
-                        vertice.setValor(grafo.getVertices().get(i).getValor());
-                        vertice.setDestinos(grafo.getVertices().get(i).getDestinos());
-                        novaListaDestinos = preencheDestinosVazios(vertice);
-                        vertice.setDestinos(novaListaDestinos);
+                        if (grafo.getVertices().get(i).getDestinos().get(j).getPeso() > 0 && grafo.getVertices().get(i).getDestinos().get(j).getPeso() < menorDistancia) {
 
-                        menorDistancia = grafo.getVertices().get(i).getDestinos().get(j).getPeso();
+                            vertice.setValor(grafo.getVertices().get(i).getValor());
+                            vertice.setDestinos(grafo.getVertices().get(i).getDestinos());
+                            novaListaDestinos = preencheDestinosVazios(vertice);
+                            vertice.setDestinos(novaListaDestinos);
 
-                        vertice.getDestinos().get(j).setPeso(menorDistancia);
+                            menorDistancia = grafo.getVertices().get(i).getDestinos().get(j).getPeso();
 
-                        verticeD.setValor(vertice.getDestinos().get(j).getDestino().getValor());
-                        verticeD.setDestinos(vertice.getDestinos().get(j).getDestino().getDestinos());
-                        novaListaDestinos = preencheDestinosVazios(verticeD);
-                        verticeD.setDestinos(novaListaDestinos);
+                            vertice.getDestinos().get(j).setPeso(menorDistancia);
 
-                        verticeD.getDestinos().get(i).setPeso(menorDistancia);
+                            verticeD.setValor(vertice.getDestinos().get(j).getDestino().getValor());
+                            verticeD.setDestinos(vertice.getDestinos().get(j).getDestino().getDestinos());
+                            novaListaDestinos = preencheDestinosVazios(verticeD);
+                            verticeD.setDestinos(novaListaDestinos);
+
+                            verticeD.getDestinos().get(i).setPeso(menorDistancia);
+                        }
                     }
                 }
             }
-            grafoAGM.adicionarVerticeComPeso(vertice);
-            grafoAGM.adicionarVerticeComPeso(verticeD);
+            if (!grafoAGM.getVertices().contains(vertice)) {
+                grafoAGM.adicionarVerticeComPeso(vertice);
+            }
+            if (!grafoAGM.getVertices().contains(verticeD)) {
+                grafoAGM.adicionarVerticeComPeso(verticeD);
+            }
 
             System.out.println(Arrays.deepToString((Object[]) vertice.getValor()));
         }
