@@ -219,18 +219,13 @@ public class Grafo<T> {
         return marcados;
     }
 
-    private boolean checaCiclo(Grafo<T> grafoAGM, Vertice<T> origem) {
-
-        for (int vertice = 0; vertice < origem.getDestinos().size(); vertice++) {
-            if (origem.getDestinos().get(vertice).getPeso() > 0 ) {
-                origem = origem.getDestinos().get(vertice).getDestino();
-
-                if (grafoAGM.getVertices().contains(origem)) {
-                    return true;
-                }
+    private boolean checaCiclo(Grafo<T> grafoAGM, T origem, T destino) {
+        System.out.println(grafoAGM.getVertices().size());
+        if (grafoAGM.getVertices().size() > 0 && grafoAGM.getVertices().contains(grafoAGM.obterVertice(origem))) {
+            if (grafoAGM.getVertices().contains(grafoAGM.obterVertice(destino))) {
+                return true;
             }
         }
-
         return false;
     }
 
@@ -253,25 +248,27 @@ public class Grafo<T> {
     // Metodo para construcao da arvore geradora minima
     public Grafo<T> calculaArvoreGeradoraMinima (Grafo<T> grafo) {
         Grafo<T> grafoAGM = new Grafo<>();
-        float menorDistancia = Float.POSITIVE_INFINITY;
+        float menorDistancia = 0.0f;
 
-        ArrayList<Aresta<T>> listaDestinosOrdenada = new ArrayList<>();
         Vertice<T> vertice = new Vertice<>();
         Vertice<T> verticeD = new Vertice<>();
 
         ArrayList<Aresta<T>> novaListaDestinos;
 
-        while (grafoAGM.getVertices().size() != grafo.getVertices().size() || !Float.isInfinite(menorDistancia)) {
+        while (!Float.isInfinite(menorDistancia)) {
             menorDistancia = Float.POSITIVE_INFINITY;
 
             for (int i = 0; i < grafo.getVertices().size(); i++) {
 
                 for (int j = 0; j < grafo.getVertices().get(i).getDestinos().size(); j++) {
 
-                    // acertar isso
-                    if (grafoAGM.getVertices().size() == 0 || grafoAGM.obterVertice(grafo.getVertices().get(i).getValor()).getDestinos().get(j).getPeso() == 0) {
+                    if (grafo.getVertices().get(i).getDestinos().get(j).getPeso() > 0 && grafo.getVertices().get(i).getDestinos().get(j).getPeso() < menorDistancia) {
 
-                        if (grafo.getVertices().get(i).getDestinos().get(j).getPeso() > 0 && grafo.getVertices().get(i).getDestinos().get(j).getPeso() < menorDistancia) {
+                        if (!checaCiclo(grafoAGM, grafo.getVertices().get(i).getValor(), grafo.getVertices().get(i).getDestinos().get(j).getDestino().getValor())) {
+
+                            System.out.println(Arrays.deepToString((Object[]) grafo.getVertices().get(i).getValor()));
+                            System.out.println(Arrays.deepToString((Object[]) grafo.getVertices().get(i).getDestinos().get(j).getDestino().getValor()));
+
 
                             vertice.setValor(grafo.getVertices().get(i).getValor());
                             vertice.setDestinos(grafo.getVertices().get(i).getDestinos());
@@ -298,8 +295,6 @@ public class Grafo<T> {
             if (!grafoAGM.getVertices().contains(verticeD)) {
                 grafoAGM.adicionarVerticeComPeso(verticeD);
             }
-
-            System.out.println(Arrays.deepToString((Object[]) vertice.getValor()));
         }
 
         // a cada vertice fazer uma lista dos destinos com peso maior que 0, em ordem crescente

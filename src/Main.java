@@ -20,7 +20,7 @@ public class Main {
         Grafo<String[]> grafoArvoreGeradoraMinima = new Grafo<>();
 
         grafoArvoreGeradoraMinima = grafo.calculaArvoreGeradoraMinima(grafo);
-        // imprimeCidades(grafoArvoreGeradoraMinima);
+        imprimeCidades(grafoArvoreGeradoraMinima);
     }
 
     // Metodo chamado para obter e imprimir o caminho minimo entre dois vertices
