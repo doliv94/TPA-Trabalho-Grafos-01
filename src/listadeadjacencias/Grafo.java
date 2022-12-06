@@ -221,6 +221,7 @@ public class Grafo<T> {
         return marcados;
     }
 
+    // Metodo que checa se a aresta entre dois vertices forma um ciclo na arvore
     private boolean checaCiclo(Grafo<T> grafo, T origem, T destino){
 
         ArrayList<Vertice<T>> fila = new ArrayList<>();
@@ -366,5 +367,12 @@ public class Grafo<T> {
         }
 
         return grafoAGM;
+    }
+
+    // Metodo para determinar o fluxo maximo entre dois vertices
+    public void calculaFluxoMaximo (Vertice<T> origem, Vertice<T> destino) {
+        // fazer uma lista com os valores minimos e maiores que 0
+        //
+
     }
 }

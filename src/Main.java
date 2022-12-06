@@ -15,9 +15,27 @@ import listadeadjacencias.*;
 
 public class Main {
 
+    // Metodo chamado para obter e imprimir o fluxo maximo entre dois vertices
+    private static void imprimeFluxoMaximo(Grafo<String[]> grafo, int cidadeOrigem, int cidadeDestino) {
+        Vertice<String[]> cidadeO = grafo.getVertices().get(cidadeOrigem - 1); // Pega o vertice da cidade de origem de acordo com o codigo de entrada
+        Vertice<String[]> cidadeD = grafo.getVertices().get(cidadeDestino - 1); // Pega o vertice da cidade de destino de acordo com o codigo de entrada
+
+        // ...Se os vertices das duas cidades existirem e nao forem nulos
+        if(cidadeO != null && cidadeD != null) {
+            System.out.println("\nCidade de Origem: " + Arrays.deepToString(cidadeO.getValor()));
+            System.out.println("Cidade de Destino: " + Arrays.deepToString(cidadeD.getValor()));
+
+            grafo.calculaFluxoMaximo(cidadeO, cidadeD); // Chama o metodo do fluxo maximo
+        }
+        // ...Se por algum motivo um dos vertices existir, mas seu valor for nulo
+        else {
+            System.out.println("Não foi possível realizar a operação com os valores requisitados.");
+        }
+    }
+
     // Metodo que vai realizar a chamada para criacao da arvore geradora minima e em seguida imprimi-la
     private static void imprimeArvoreGeradoraMinima(Grafo<String[]> grafo) {
-        Grafo<String[]> grafoArvoreGeradoraMinima = new Grafo<>();
+        Grafo<String[]> grafoArvoreGeradoraMinima;
 
         grafoArvoreGeradoraMinima = grafo.calculaArvoreGeradoraMinima(grafo);
         imprimeCidades(grafoArvoreGeradoraMinima);
@@ -287,7 +305,7 @@ public class Main {
         String opcao = ""; // Variavel que vai guiar as opcoes do menu
 
         int entrada; // Vai receber a entrada do usuario de codigo da cidade
-        int entradaDestino; // Vai receber a entrada do usuario de codigo da cidade de destino na opcao 3 do menu
+        int entradaDestino; // Vai receber a entrada do usuario de codigo da cidade de destino na opcao 3 e 5 do menu
 
         // O menu com as opcoes vai rodar enquanto o usuario nao escolher umas das 3 opcoes disponiveis
         while (!opcao.equals("0")) {
@@ -297,6 +315,7 @@ public class Main {
             System.out.println(" --- 2: OBTER TODOS OS CAMINHOS DA CIDADE");
             System.out.println(" --- 3: CALCULAR CAMINHO MINIMO"); // Entrega 2 do trabalho
             System.out.println(" --- 4: CALCULAR ÁRVORE GERADORA MÍNIMA"); // Entrega 3 do trabalho
+            System.out.println(" --- 5: CALCULAR FLUXO MÁXIMO"); // Entrega 4 do trabalho
             System.out.println("\n --- 0: SAIR"); // Na entrega anterior, SAIR era a opcao 3, para manter um padrao nas proximas entregas, SAIR foi alterado para 0
             System.out.println("\n*******************************************\n");
             System.out.print("-> ");
@@ -320,6 +339,7 @@ public class Main {
                     System.out.print("\nAperte enter para voltar");
                     input.nextLine();
                 }
+
                 case "2" -> {
                     System.out.println("\n\n*****OBTER TODOS OS CAMINHOS DA CIDADE*****");
 
@@ -353,7 +373,7 @@ public class Main {
                         // Verifica se o valor digitado para o vertice de destino eh uma entrada valida
                         entradaDestino = checaEntrada(grafo, input);
 
-                        // ...Se for, chama o metodo para calcula e imprimir o caminho minimo
+                        // ...Se for, chama o metodo para calcular e imprimir o caminho minimo
                         if (entradaDestino != -1) {
                             imprimeCaminhoMinimo(grafo, entrada, entradaDestino);
                         }
@@ -372,6 +392,35 @@ public class Main {
 
                     imprimeArvoreGeradoraMinima(grafo); // Chama o metodo para gerar e imprimir a arvore geradora minima
 
+                    input = new Scanner(System.in);
+                    System.out.print("\nAperte enter para voltar");
+                    input.nextLine();
+                }
+
+                // Entrega 4
+                case "5" -> {
+                    System.out.println("\n\n***********CALCULAR FLUXO MÁXIMO***********");
+
+                    System.out.println("\nDigite o código da cidade de origem (1 a " + grafo.getVertices().size() + "):");
+                    System.out.print("-> ");
+                    // Verifica se o valor digitado para o vertice de origem eh uma entrada valida
+                    entrada = checaEntrada(grafo, input);
+
+                    // ...Se for
+                    if (entrada != -1) {
+                        System.out.println("\nDigite o código da cidade de destino (1 a " + grafo.getVertices().size() + "):");
+                        System.out.print("-> ");
+                        // Verifica se o valor digitado para o vertice de destino eh uma entrada valida
+                        entradaDestino = checaEntrada(grafo, input);
+
+                        // ...Se for, chama o metodo para calcular e imprimir o fluxo maximo
+                        if (entradaDestino != -1) {
+                            imprimeFluxoMaximo(grafo, entrada, entradaDestino);
+                        }
+                    }
+
+                    // Caso alguma entrada nao seja valida ou o metodo tenha sido realizado, o programa espera que o
+                    // usuario aperte enter e retorna para o menu de opcoes
                     input = new Scanner(System.in);
                     System.out.print("\nAperte enter para voltar");
                     input.nextLine();
