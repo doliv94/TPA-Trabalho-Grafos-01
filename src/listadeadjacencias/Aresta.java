@@ -2,7 +2,9 @@ package listadeadjacencias;
 
 public class Aresta<T> {
     // Vertice (cidade) de destino
-    private Vertice<T> destino = new Vertice<>(); // Inicializa vertice
+    private Vertice<T> destino = new Vertice<>(); // Inicializa vertice de destino
+
+    private Vertice<T> origem = new Vertice<>(); // Inicializa vertice de origem
 
     // Distancia entre a cidade de origem e a de destino
     private float peso;
@@ -35,5 +37,13 @@ public class Aresta<T> {
     }
     public void setPeso(float peso) {
         this.peso = peso;
+    }
+
+    // get e set para acesso ao vertice de origem
+    public Vertice<T> getOrigem() {
+        return origem;
+    }
+    public void setOrigem(Vertice<T> origem) {
+        this.origem = origem;
     }
 }

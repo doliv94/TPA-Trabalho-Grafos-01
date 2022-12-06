@@ -222,70 +222,117 @@ public class Grafo<T> {
         return marcados;
     }
 
-    private boolean checaCiclo(Grafo<T> grafoAGM, Vertice<T> origem) {
+    private boolean checaCiclo(Vertice<T> origem, Vertice<T> destino){
 
-        for (int vertice = 0; vertice < origem.getDestinos().size(); vertice++) {
-            if (origem.getDestinos().get(vertice).getPeso() > 0 ) {
-                origem = origem.getDestinos().get(vertice).getDestino();
+        for (int i = 0; i < origem.getDestinos().size(); i++) {
+            if (origem.getDestinos().get(i).getDestino().getValor() == destino.getValor()) {
 
-                if (grafoAGM.getVertices().contains(origem)) {
-                    return true;
-                }
+                return true;
             }
         }
 
+
         return false;
-    }
-
-    private ArrayList<Aresta<T>> preencheDestinosVazios (Vertice<T> vertice) {
-
-        ArrayList<Aresta<T>> novaListaDestinos = new ArrayList<>();
-        Aresta<T> novaAresta = new Aresta<>();
-
-        for (int i = 0; i < vertice.getDestinos().size(); i++) {
-            novaAresta.setDestino(vertice.getDestinos().get(i).getDestino());
-            novaAresta.setPeso(0.00f);
-
-            novaListaDestinos.add(novaAresta);
-            // System.out.println(Arrays.deepToString((Object[]) vertice.getValor()));
-        }
-
-        return novaListaDestinos;
     }
 
     // Implementado o Algoritmo de Kruskal
     // Metodo para construcao da arvore geradora minima
     public Grafo<T> calculaArvoreGeradoraMinima (Grafo<T> grafo) {
         Grafo<T> grafoAGM = new Grafo<>();
-        Float menorDistancia = Float.POSITIVE_INFINITY;
 
-        ArrayList<Aresta<T>> listaDestinosOrdenada = new ArrayList<>();
-        Vertice<T> vertice = new Vertice<>();
+        ArrayList<Aresta<T>> destinosOrdenados = new ArrayList<>();
+        int destinos = 0;
 
-        ArrayList<Aresta<T>> novaListaDestinos;
+        ArrayList<Aresta<T>> novaListaDestino = new ArrayList<>();
+        Aresta<T> novoDestino = new Aresta<>();
 
-        menorDistancia = Float.POSITIVE_INFINITY;
         for (int i = 0; i < grafo.getVertices().size(); i++) {
-
             for (int j = 0; j < grafo.getVertices().get(i).getDestinos().size(); j++) {
+                Aresta<T> nova = new Aresta<>();
 
-                if (grafo.getVertices().get(i).getDestinos().get(j).getPeso() > 0 && grafo.getVertices().get(i).getDestinos().get(j).getPeso() < menorDistancia) {
+                if (grafo.getVertices().get(i).getDestinos().get(j).getPeso() > 0) {
+                    nova.setOrigem(grafo.getVertices().get(i));
+                    nova.setDestino(grafo.getVertices().get(i).getDestinos().get(j).getDestino());
+                    nova.setPeso(grafo.getVertices().get(i).getDestinos().get(j).getPeso());
 
-                    vertice.setValor(grafo.getVertices().get(i).getValor());
-                    vertice.setDestinos(grafo.getVertices().get(i).getDestinos());
-                    novaListaDestinos = preencheDestinosVazios(vertice);
-                    vertice.setDestinos(novaListaDestinos);
-
-                    menorDistancia = grafo.getVertices().get(i).getDestinos().get(j).getPeso();
-
-                    vertice.getDestinos().get(j).setPeso(menorDistancia);
+                    destinosOrdenados.add(nova);
                 }
             }
         }
-        grafoAGM.adicionarVerticeComPeso(vertice);
+        destinosOrdenados.sort(Comparator.comparing(Aresta::getPeso));
 
-        System.out.println(Arrays.deepToString((Object[]) vertice.getValor()));
+        grafoAGM.adicionarArestaComPeso(destinosOrdenados.get(0).getOrigem().getValor(), destinosOrdenados.get(0).getDestino().getValor(), destinosOrdenados.get(0).getPeso());
 
+        novoDestino.setDestino(destinosOrdenados.get(0).getOrigem());
+        novoDestino.setPeso(destinosOrdenados.get(0).getPeso());
+        novaListaDestino.add(novoDestino);
+
+        grafoAGM.obterVertice(destinosOrdenados.get(0).getDestino().getValor()).setDestinos(novaListaDestino);
+
+        System.out.println(grafoAGM.getVertices().size());
+
+
+        for (int i = 0; i < destinosOrdenados.size(); i++) {
+            // sem origem com destino
+            if (!grafoAGM.checaVerticeExiste(destinosOrdenados.get(i).getOrigem().getValor()) && grafoAGM.checaVerticeExiste(destinosOrdenados.get(i).getDestino().getValor())) {
+                novoDestino = new Aresta<>();
+
+                novoDestino.setDestino(destinosOrdenados.get(i).getOrigem());
+                novoDestino.setPeso(destinosOrdenados.get(i).getPeso());
+
+                grafoAGM.obterVertice(destinosOrdenados.get(i).getDestino().getValor()).adicionarDestino(novoDestino);
+
+                grafoAGM.adicionarVertice(destinosOrdenados.get(i).getOrigem().getValor());
+
+                novoDestino = new Aresta<>();
+
+                novoDestino.setDestino(destinosOrdenados.get(i).getDestino());
+                novoDestino.setPeso(destinosOrdenados.get(i).getPeso());
+
+                grafoAGM.obterVertice(destinosOrdenados.get(i).getOrigem().getValor()).adicionarDestino(novoDestino);
+                destinos++;
+            }
+            // com origem sem destino
+            else if (grafoAGM.checaVerticeExiste(destinosOrdenados.get(i).getOrigem().getValor()) && !grafoAGM.checaVerticeExiste(destinosOrdenados.get(i).getDestino().getValor())) {
+                novoDestino = new Aresta<>();
+
+                novoDestino.setDestino(destinosOrdenados.get(i).getDestino());
+                novoDestino.setPeso(destinosOrdenados.get(i).getPeso());
+
+                grafoAGM.obterVertice(destinosOrdenados.get(i).getOrigem().getValor()).adicionarDestino(novoDestino);
+
+                grafoAGM.adicionarVertice(destinosOrdenados.get(i).getDestino().getValor());
+
+                novoDestino = new Aresta<>();
+
+                novoDestino.setDestino(destinosOrdenados.get(i).getOrigem());
+                novoDestino.setPeso(destinosOrdenados.get(i).getPeso());
+
+                grafoAGM.obterVertice(destinosOrdenados.get(i).getDestino().getValor()).adicionarDestino(novoDestino);
+                destinos++;
+            }
+            // sem origem sem destino
+            else if (!grafoAGM.checaVerticeExiste(destinosOrdenados.get(i).getOrigem().getValor()) && !grafoAGM.checaVerticeExiste(destinosOrdenados.get(i).getDestino().getValor())) {
+                grafoAGM.adicionarArestaComPeso(destinosOrdenados.get(i).getOrigem().getValor(), destinosOrdenados.get(i).getDestino().getValor(), destinosOrdenados.get(i).getPeso());
+
+                novaListaDestino = new ArrayList<>();
+                novoDestino = new Aresta<>();
+
+                novoDestino.setDestino(destinosOrdenados.get(i).getOrigem());
+                novoDestino.setPeso(destinosOrdenados.get(i).getPeso());
+                novaListaDestino.add(novoDestino);
+
+                grafoAGM.obterVertice(destinosOrdenados.get(i).getDestino().getValor()).setDestinos(novaListaDestino);
+                destinos++;
+            }
+            else {
+                if (!checaCiclo(grafoAGM.obterVertice(destinosOrdenados.get(i).getOrigem().getValor()), grafoAGM.obterVertice(destinosOrdenados.get(i).getDestino().getValor())) && destinos < grafo.getVertices().size() - 1) {
+
+                    destinos++;
+                }
+            }
+        }
+        System.out.println(grafoAGM.getVertices().size());
 
         // a cada vertice fazer uma lista dos destinos com peso maior que 0, em ordem crescente
         // procura peso menor -> checa se ele faz ciclo -> adiciona ou nao -> repete processo
