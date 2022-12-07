@@ -426,4 +426,10 @@ public class Grafo<T> {
         return retorno;
     }
 
+    // Metodo para determinar o fluxo maximo entre dois vertices
+    public void calculaFluxoMaximo (Vertice<T> origem, Vertice<T> destino) {
+        // fazer uma lista com os valores minimos e maiores que 0
+        //
+
+    }
 }

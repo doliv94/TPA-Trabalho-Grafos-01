@@ -14,6 +14,23 @@ import listadeadjacencias.*;
 
 
 public class Main {
+    // Metodo chamado para obter e imprimir o fluxo maximo entre dois vertices
+    private static void imprimeFluxoMaximo(Grafo<String[]> grafo, int cidadeOrigem, int cidadeDestino) {
+        Vertice<String[]> cidadeO = grafo.getVertices().get(cidadeOrigem - 1); // Pega o vertice da cidade de origem de acordo com o codigo de entrada
+        Vertice<String[]> cidadeD = grafo.getVertices().get(cidadeDestino - 1); // Pega o vertice da cidade de destino de acordo com o codigo de entrada
+
+        // ...Se os vertices das duas cidades existirem e nao forem nulos
+        if(cidadeO != null && cidadeD != null) {
+            System.out.println("\nCidade de Origem: " + Arrays.deepToString(cidadeO.getValor()));
+            System.out.println("Cidade de Destino: " + Arrays.deepToString(cidadeD.getValor()));
+
+            grafo.calculaFluxoMaximo(cidadeO, cidadeD); // Chama o metodo do fluxo maximo
+        }
+        // ...Se por algum motivo um dos vertices existir, mas seu valor for nulo
+        else {
+            System.out.println("Não foi possível realizar a operação com os valores requisitados.");
+        }
+    }
 
     // Metodo que vai realizar a chamada para criacao da arvore geradora minima e em seguida imprimi-la
     private static void imprimeArvoreGeradoraMinima(Grafo<String[]> grafo) {
@@ -293,7 +310,7 @@ public class Main {
         String opcao = ""; // Variavel que vai guiar as opcoes do menu
 
         int entrada; // Vai receber a entrada do usuario de codigo da cidade
-        int entradaDestino; // Vai receber a entrada do usuario de codigo da cidade de destino na opcao 3 do menu
+        int entradaDestino; // Vai receber a entrada do usuario de codigo da cidade de destino na opcao 3 e 5 do menu
 
         // O menu com as opcoes vai rodar enquanto o usuario nao escolher umas das 3 opcoes disponiveis
         while (!opcao.equals("0")) {
@@ -303,6 +320,7 @@ public class Main {
             System.out.println(" --- 2: OBTER TODOS OS CAMINHOS DA CIDADE");
             System.out.println(" --- 3: CALCULAR CAMINHO MINIMO"); // Entrega 2 do trabalho
             System.out.println(" --- 4: CALCULAR ÁRVORE GERADORA MÍNIMA"); // Entrega 3 do trabalho
+            System.out.println(" --- 5: CALCULAR FLUXO MÁXIMO"); // Entrega 4 do trabalho
             System.out.println("\n --- 0: SAIR"); // Na entrega anterior, SAIR era a opcao 3, para manter um padrao nas proximas entregas, SAIR foi alterado para 0
             System.out.println("\n*******************************************\n");
             System.out.print("-> ");
@@ -386,6 +404,35 @@ public class Main {
                     input.nextLine();
                 }
 
+                // Entrega 4
+                case "5" -> {
+                    System.out.println("\n\n***********CALCULAR FLUXO MÁXIMO***********");
+
+                    System.out.println("\nDigite o código da cidade de origem (1 a " + grafo.getVertices().size() + "):");
+                    System.out.print("-> ");
+                    // Verifica se o valor digitado para o vertice de origem eh uma entrada valida
+                    entrada = checaEntrada(grafo, input);
+
+                    // ...Se for
+                    if (entrada != -1) {
+                        System.out.println("\nDigite o código da cidade de destino (1 a " + grafo.getVertices().size() + "):");
+                        System.out.print("-> ");
+                        // Verifica se o valor digitado para o vertice de destino eh uma entrada valida
+                        entradaDestino = checaEntrada(grafo, input);
+
+                        // ...Se for, chama o metodo para calcular e imprimir o fluxo maximo
+                        if (entradaDestino != -1) {
+                            imprimeFluxoMaximo(grafo, entrada, entradaDestino);
+                        }
+                    }
+
+                    // Caso alguma entrada nao seja valida ou o metodo tenha sido realizado, o programa espera que o
+                    // usuario aperte enter e retorna para o menu de opcoes
+                    input = new Scanner(System.in);
+                    System.out.print("\nAperte enter para voltar");
+                    input.nextLine();
+                }
+
                 // Alterada a opcao de '3' para '0', para incluir as novas funcionalidades no menu
                 case "0" -> System.out.println("\nTchauzim!"); // Encerra o programa
             }
@@ -401,7 +448,7 @@ public class Main {
 
         GeradorArquivosGrafo g = new GeradorArquivosGrafo(); // Instancia um gerador de arquivos
         String nomeArquivoEntrada; // Cria variavel que vai ter o nome do arquivo gerado
-        int quantCidades = 9; // Variavel para definir a quantidade de cidade que serao criadas no arquivo
+        int quantCidades = 7; // Variavel para definir a quantidade de cidade que serao criadas no arquivo
 
         // Gera um arquivo com a quantidade definida de cidades
         // Passa o nome do arquivo gerado para a variavel
@@ -410,12 +457,12 @@ public class Main {
         // Le o arquivo gerado
         grafo = abreArquivo(nomeArquivoEntrada); // O grafo vai receber os valores do arquivo a partir desse metodo
 
-        // O arquivo de 9 entradas utilizado aqui foi criado manualmente, com base no grafo do exemplo do algoritmo
-        // de kruskal disponibilizado no slide do ava
+        // O arquivo de 7 entradas utilizado aqui foi criado manualmente, com base no grafo do exemplo do algoritmo
+        // de Ford-Fulkerson disponibilizado no slide do ava
 
         // Como dito em entregas anteriores, as modificacoes feitas no Gerador de Arquivos impedem que seja criado mais de um
         // arquivo com mesmo nome (que eh nomeado pela quantidade de entradas) dentro da pasta _entrada_registros,
-        // por isso usar quantCidades = 9 aqui, colocando o arquivo criado manualmente com o nome seguindo esse padrao
+        // por isso usar quantCidades = 7 aqui, colocando o arquivo criado manualmente com o nome seguindo esse padrao
         // dentro da pasta, permite a leitura dele sem sua substituicao
 
         // Imprime as cidades que foram colocadas no grafo conforme o arquivo de entrada
