@@ -1,6 +1,7 @@
 package listadeadjacencias;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 
 public class Grafo<T> {
@@ -426,10 +427,57 @@ public class Grafo<T> {
         return retorno;
     }
 
+    private boolean montaCaminho(ArrayList<Vertice<T>> fila, Vertice<T> proxVertice, Vertice<T> origem, Vertice<T> destino) {
+        ArrayList<Vertice<T>> caminho = new ArrayList<>();
+        float fluxoMax = 0.0f;
+        fila.add(proxVertice);
+
+        for (int j = 0; j < proxVertice.getDestinos().size(); j++) {
+
+            if (proxVertice.getDestinos().get(j).getPeso() > 0 && proxVertice.getDestinos().get(j).getDestino() != origem) {
+                if (proxVertice.getDestinos().get(j).getDestino() == destino) {
+
+
+                    return true;
+                }
+                else {
+                    if (proxVertice.getDestinos().get(j).getDestino() != origem && !fila.contains(proxVertice.getDestinos().get(j).getDestino())) {
+                        if (montaCaminho(fila, proxVertice.getDestinos().get(j).getDestino(), origem, destino)) {
+
+                            if (!caminho.contains(origem)) {
+                                caminho.add(0, origem);
+                                caminho.add(caminho.size() - 1, proxVertice.getDestinos().get(j).getDestino());
+                                caminho.add(caminho.size(), destino);
+                            }
+                            caminho.add(1, proxVertice);
+
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+        return false;
+    }
+
     // Metodo para determinar o fluxo maximo entre dois vertices
     public void calculaFluxoMaximo (Vertice<T> origem, Vertice<T> destino) {
-        // fazer uma lista com os valores minimos e maiores que 0
-        //
+        boolean caminho;
+        Vertice<T> proxVertice = new Vertice<>();
+        ArrayList<Vertice<T>> fila = new ArrayList<>();
+
+        for (int i = 0; i < origem.getDestinos().size(); i++) {
+
+            if (origem.getDestinos().get(i).getPeso() > 0) {
+                proxVertice = origem.getDestinos().get(i).getDestino();
+                caminho = montaCaminho(fila, proxVertice, origem, destino);
+            }
+        }
+
+        // segue um caminho -> pegar o menor peso das arestas de ida -> faz o balanceamento no sentido inverso
 
     }
 }
