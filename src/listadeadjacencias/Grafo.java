@@ -1,7 +1,6 @@
 package listadeadjacencias;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 
 public class Grafo<T> {
@@ -222,20 +221,26 @@ public class Grafo<T> {
     }
 
     // Metodo que checa se a aresta entre dois vertices forma um ciclo na arvore
-    private boolean checaCiclo(Grafo<T> grafo, T origem, T destino){
+    private boolean checaCiclo(Grafo<T> grafoAGM, T origem, T destino){
 
-        ArrayList<Vertice<T>> fila = new ArrayList<>();
-        Vertice<T> checa = grafo.obterVertice(origem);
-        fila.add(checa);
+        ArrayList<Vertice<T>> fila = new ArrayList<>(); // Usaremos uma lista para ter controle de quais vertices estamos verificando
+        Vertice<T> checa = grafoAGM.obterVertice(origem); // O vertice sendo checado, comeca com o valor de origem da entrada
+        fila.add(checa); // Adicionamos ele na fila
 
+        // Para cada vertice na fila, verificaremos se um dos destinos que ele possui leva ao valor destino da entrada
         for (int i = 0; i < fila.size(); i++) {
-            checa = grafo.obterVertice(fila.get(i).getValor());
+            checa = grafoAGM.obterVertice(fila.get(i).getValor()); // A variavel vai pegar cada vertice da fila
 
+            // Verifica os destinos
             for (int j = 0; j < checa.getDestinos().size(); j++) {
+
+                // Se o destino do vertice sendo conferido tiver o mesmo valor que o destino da entrada
                 if (checa.getDestinos().get(j).getDestino().getValor() == destino) {
-                    return true;
+                    return true; // Ciclo confirmado, sai do metodo e nao adiciona a aresta atual no grafoAGM
                 }
+                // E se nao for igual
                 else {
+                    // Adiciona esse destino na fila para checagem, caso ele ja nao esteja la
                     if (!fila.contains(checa.getDestinos().get(j).getDestino())) {
                         fila.add(checa.getDestinos().get(j).getDestino());
                     }
@@ -243,136 +248,182 @@ public class Grafo<T> {
             }
         }
 
+        // Se tivermos passado por todos os vertices da fila e nenhum dos destinos deles tiveram o mesmo valor que o destino da
+        // entrada, retornamos falso, ou seja, nao ha ciclo e pode adicionar essa aresta no grafoAGM
         return false;
     }
 
     // Implementado o Algoritmo de Kruskal
     // Metodo para construcao da arvore geradora minima
-    public Grafo<T> calculaArvoreGeradoraMinima (Grafo<T> grafo) {
-        Grafo<T> grafoAGM = new Grafo<>();
+    // (eh tanta repeticao de codigo que nao cabe no cartaz, mas o medo de estragar tudo ajeitando e a falta de tempo impedem de corrigir isso no momento)
+    public ArrayList calculaArvoreGeradoraMinima (Grafo<T> grafo) {
+        ArrayList retorno = new ArrayList<>(); // No final vai armazenar a arvore geradora minima e a soma dos pesos dela
+        Grafo<T> grafoAGM = new Grafo<>(); // Vai guardar a arvore geradora minima
+        float somaTotalPesos = 0.0f; // Vai guardar a soma dos pesos das arestas
 
-        ArrayList<Aresta<T>> destinosOrdenados = new ArrayList<>();
+        ArrayList<Aresta<T>> destinosOrdenados = new ArrayList<>(); // Cria uma lista que ira armazenar todas as arestas com peso maior que 0 do grafo
+        // Para simplificar a identificacao dos vertices de origem de cada aresta dessa lista,foi criada a variavel Vertice<T> origem na classe Aresta
+        // com os metodos de get e set para acessa-la
 
-        ArrayList<Aresta<T>> novaListaDestino = new ArrayList<>();
-        Aresta<T> novoDestino = new Aresta<>();
+        ArrayList<Aresta<T>> novaListaDestino = new ArrayList<>(); // Cria uma lista que vai guardar os novos destinos de cada vertice
+        Aresta<T> novoDestino = new Aresta<>(); // Para adicionar um novo destino em um vertice existente na arvore sera usada essa variavel
 
-        for (int i = 0; i < grafo.getVertices().size(); i++) {
-            for (int j = 0; j < grafo.getVertices().get(i).getDestinos().size(); j++) {
-                Aresta<T> nova = new Aresta<>();
+        // Aqui passaremos por cada destino do grafo, adicionando todas as arestas que tiverem peso maior que 0 na lista destinosOrdenados
+        for (int i = 0; i < grafo.getVertices().size(); i++) { // Pega um vertice
+            for (int j = 0; j < grafo.getVertices().get(i).getDestinos().size(); j++) { // Pega um destino desse vertice
+                Aresta<T> nova = new Aresta<>(); // O caminho entre os vertices
 
+                // Se o caminho for maior que 0
                 if (grafo.getVertices().get(i).getDestinos().get(j).getPeso() > 0) {
-                    nova.setOrigem(grafo.getVertices().get(i));
-                    nova.setDestino(grafo.getVertices().get(i).getDestinos().get(j).getDestino());
-                    nova.setPeso(grafo.getVertices().get(i).getDestinos().get(j).getPeso());
+                    nova.setOrigem(grafo.getVertices().get(i)); // Define a origem desse caminho
+                    nova.setDestino(grafo.getVertices().get(i).getDestinos().get(j).getDestino()); // Define o destino desse caminho
+                    nova.setPeso(grafo.getVertices().get(i).getDestinos().get(j).getPeso()); // Define o peso do caminho
 
-                    destinosOrdenados.add(nova);
+                    destinosOrdenados.add(nova); // Adiciona essa aresta do caminho na lista
+
+                    // Eh utilizada uma nova aresta para que seja possivel separar as informacoes de cada aresta sem mexermos na original
                 }
             }
         }
 
+        // Caso essa lista com todas as arestas seja maior que 0
         if (destinosOrdenados.size() > 0) {
-            destinosOrdenados.sort(Comparator.comparing(Aresta::getPeso));
+            destinosOrdenados.sort(Comparator.comparing(Aresta::getPeso)); // Faz jus ao nome e ordena todos os destinos que foram adicionados nela pelo peso
 
-            // Adiciona primeira aresta
+            // Adiciona primeira aresta, que eh a menor e, portanto, primeira na lista ordenada
+            // Para adicionar a aresta com peso no grafo da arvore geradora minima, passamos em ordem: origem, destino, peso
             grafoAGM.adicionarArestaComPeso(destinosOrdenados.get(0).getOrigem().getValor(), destinosOrdenados.get(0).getDestino().getValor(), destinosOrdenados.get(0).getPeso());
 
-            novoDestino.setDestino(destinosOrdenados.get(0).getOrigem());
-            novoDestino.setPeso(destinosOrdenados.get(0).getPeso());
-            novaListaDestino.add(novoDestino);
+            // Como os grafos utilizados ate agora nesse trabalho foram nao direcionado, adicionamos tambem a aresta que seria no sentido destino -> origem, de mesmo peso
+            novoDestino.setDestino(destinosOrdenados.get(0).getOrigem()); // O destino do destino fica sendo a origem
+            novoDestino.setPeso(destinosOrdenados.get(0).getPeso()); // Pegamos o peso da aresta
+            novaListaDestino.add(novoDestino); // Adicionamos essa aresta numa novaListaDestino vazia (sao os primeiros vertices do grafoAGM)
 
+            // Quando adicionamos a aresta com peso, criamos os dois vertices dentro do grafoAGM, mas o destino ficou sem uma aresta naquele momento
+            // Com o obterVertice encontramos o vertice de destino no grafoAGM e definimos o destino dele como a novaListaDestino que criamos ali em cima
             grafoAGM.obterVertice(destinosOrdenados.get(0).getDestino().getValor()).setDestinos(novaListaDestino);
 
-            // Adiciona segunda aresta
-            grafoAGM.adicionarArestaComPeso(destinosOrdenados.get(1).getOrigem().getValor(), destinosOrdenados.get(1).getDestino().getValor(), destinosOrdenados.get(1).getPeso());
+            // E se adicionamos uma aresta, somamos o peso dela na variavel
+            somaTotalPesos += destinosOrdenados.get(0).getPeso();
 
-            novoDestino = new Aresta<>();
-            novaListaDestino = new ArrayList<>();
+            // Agora passamos por cada aresta naquela lista que foi ordenada, e por estar ordenada nao precisamos nos preocupar
+            // em comparar valor antigo com atual pra saber qual eh o menor antes de adicionar
+            // Se o vertice de origem ou destino da aresta nao existir no grafoAGM, ele sera adicionado, assim como o caminho para ele
+            // Se os dois vertices existem, vai checar se adicionar a aresta deles vai formar um ciclo com as outras que foram adicionadas anteriormente, se
+            // nao formar ciclo, adiciona esse caminho, se formar ciclo, ignora e segue para a proxima aresta
+            for (int i = 1; i < destinosOrdenados.size(); i++) {
 
-            novoDestino.setDestino(destinosOrdenados.get(1).getOrigem());
-            novoDestino.setPeso(destinosOrdenados.get(1).getPeso());
-            novaListaDestino.add(novoDestino);
+                // As checagens a seguir de se o vertice existe sao feitas pelos valores de cada vertice, pq os vertices do grafo de entra possuem
+                // mais informacoes na lista de destinos, enquanto os vertices do grafoAGM tem as aresta de destino simplificadas, ou seja, nao sao iguais
+                // para comparar pelo vertice inteiro, entao fazemos apenas pelo valor do vertice
 
-            grafoAGM.obterVertice(destinosOrdenados.get(1).getDestino().getValor()).setDestinos(novaListaDestino);
-
-            for (int i = 2; i < destinosOrdenados.size(); i++) {
-
-                // sem origem com destino
+                // Se no grafoAGM nao tem o vertice de origem da aresta atual, mas tem o vertice de destino
                 if (!grafoAGM.checaVerticeExiste(destinosOrdenados.get(i).getOrigem().getValor()) && grafoAGM.checaVerticeExiste(destinosOrdenados.get(i).getDestino().getValor())) {
-                    novoDestino = new Aresta<>();
+                    // Vai adicionar esse caminho para a origem na lista de destinos do vertice de destino que ja existe no grafoAGM
 
-                    novoDestino.setDestino(destinosOrdenados.get(i).getOrigem());
-                    novoDestino.setPeso(destinosOrdenados.get(i).getPeso());
+                    novoDestino = new Aresta<>(); // Caminho novo
 
+                    novoDestino.setDestino(destinosOrdenados.get(i).getOrigem()); // Destino -> Origem
+                    novoDestino.setPeso(destinosOrdenados.get(i).getPeso()); // Define o peso do caminho
+
+                    // Encontramos o vertice no grafo e adicionamos esse novo destino na lista de destinos dele
                     grafoAGM.obterVertice(destinosOrdenados.get(i).getDestino().getValor()).adicionarDestino(novoDestino);
 
+                    // Adiciona o vertice de origem no grafoAGM, mas sem a aresta de destino dele daqui
                     grafoAGM.adicionarVertice(destinosOrdenados.get(i).getOrigem().getValor());
 
-                    novoDestino = new Aresta<>();
+                    // Como feito em cima, adiciona o caminho para o destino na lista de destinos do vertice de origem que agora ja existe no grafoAGM
+                    novoDestino = new Aresta<>(); // Caminho novo
 
-                    novoDestino.setDestino(destinosOrdenados.get(i).getDestino());
-                    novoDestino.setPeso(destinosOrdenados.get(i).getPeso());
+                    novoDestino.setDestino(destinosOrdenados.get(i).getDestino()); // Origem -> Destino
+                    novoDestino.setPeso(destinosOrdenados.get(i).getPeso()); // Define o peso do caminho
 
+                    // Encontramos o vertice no grafo e adicionamos esse novo destino na lista de destinos dele
                     grafoAGM.obterVertice(destinosOrdenados.get(i).getOrigem().getValor()).adicionarDestino(novoDestino);
+
+                    // Somamos o peso da aresta na variavel
+                    somaTotalPesos += destinosOrdenados.get(i).getPeso();
                 }
-                // com origem sem destino
+                // Se no grafoAGM tem o vertice de origem da aresta atual, mas nao tem o vertice de destino
                 else if (grafoAGM.checaVerticeExiste(destinosOrdenados.get(i).getOrigem().getValor()) && !grafoAGM.checaVerticeExiste(destinosOrdenados.get(i).getDestino().getValor())) {
-                    novoDestino = new Aresta<>();
+                    // O contrario da anterior, comeca adicionando o caminho para o destino na lista de destinos do vertice de
+                    // origem que ja existe no grafoAGM
 
-                    novoDestino.setDestino(destinosOrdenados.get(i).getDestino());
-                    novoDestino.setPeso(destinosOrdenados.get(i).getPeso());
+                    novoDestino = new Aresta<>(); // Caminho novo
 
+                    novoDestino.setDestino(destinosOrdenados.get(i).getDestino()); // Origem -> Destino
+                    novoDestino.setPeso(destinosOrdenados.get(i).getPeso()); // Define o peso do caminho
+
+                    // Encontramos o vertice no grafo e adicionamos esse novo destino na lista de destinos dele
                     grafoAGM.obterVertice(destinosOrdenados.get(i).getOrigem().getValor()).adicionarDestino(novoDestino);
 
+                    // Adiciona o vertice de destino no grafoAGM, mas sem a aresta de destino dele daqui
                     grafoAGM.adicionarVertice(destinosOrdenados.get(i).getDestino().getValor());
 
-                    novoDestino = new Aresta<>();
+                    // ...E vamos adicionar o destino dele
+                    novoDestino = new Aresta<>(); // Caminho novo
 
-                    novoDestino.setDestino(destinosOrdenados.get(i).getOrigem());
-                    novoDestino.setPeso(destinosOrdenados.get(i).getPeso());
+                    novoDestino.setDestino(destinosOrdenados.get(i).getOrigem()); // Destino -> Origem
+                    novoDestino.setPeso(destinosOrdenados.get(i).getPeso()); // Define o peso do caminho
 
+                    // Encontramos o vertice no grafo e adicionamos esse novo destino na lista de destinos dele
                     grafoAGM.obterVertice(destinosOrdenados.get(i).getDestino().getValor()).adicionarDestino(novoDestino);
+
+                    // Somamos o peso da aresta na variavel
+                    somaTotalPesos += destinosOrdenados.get(i).getPeso();
                 }
-                // sem origem sem destino
+                // Se no grafoAGM nao tem o vertice de origem da aresta atual e nem o vertice de destino
                 else if (!grafoAGM.checaVerticeExiste(destinosOrdenados.get(i).getOrigem().getValor()) && !grafoAGM.checaVerticeExiste(destinosOrdenados.get(i).getDestino().getValor())) {
+                    // Para adicionar a aresta nova com peso, passamos em ordem: origem, destino, peso
                     grafoAGM.adicionarArestaComPeso(destinosOrdenados.get(i).getOrigem().getValor(), destinosOrdenados.get(i).getDestino().getValor(), destinosOrdenados.get(i).getPeso());
 
-                    novaListaDestino = new ArrayList<>();
-                    novoDestino = new Aresta<>();
+                    novaListaDestino = new ArrayList<>(); // Lista de destinos nova
+                    novoDestino = new Aresta<>(); // Caminho novo
 
-                    novoDestino.setDestino(destinosOrdenados.get(i).getOrigem());
-                    novoDestino.setPeso(destinosOrdenados.get(i).getPeso());
-                    novaListaDestino.add(novoDestino);
+                    novoDestino.setDestino(destinosOrdenados.get(i).getOrigem()); // Destino -> Origem
+                    novoDestino.setPeso(destinosOrdenados.get(i).getPeso()); // Define o peso do caminho
+                    novaListaDestino.add(novoDestino); // Adicionamos essa aresta numa novaListaDestino vazia
 
+                    // Encontramos o vertice no grafo e adicionamos esse novo destino na lista de destinos dele
                     grafoAGM.obterVertice(destinosOrdenados.get(i).getDestino().getValor()).setDestinos(novaListaDestino);
+
+                    // Somamos o peso da aresta na variavel
+                    somaTotalPesos += destinosOrdenados.get(i).getPeso();
                 }
-                // com origem com destino
+                // Se no grafoAGM tem o vertice de origem da aresta atual e tambem o vertice de destino
                 else {
+                    // Chama o metodo para checar se a aresta atual forma ciclo, passando o grafoAGM, e os vertices dele que possuem
+                    // esses mesmos valores da lista ordenada na origem e no destino
+                    // Se retornar falso, eh porque nao forma ciclo e o caminho eh adicionado
                     if (!checaCiclo(grafoAGM, grafoAGM.obterVertice(destinosOrdenados.get(i).getOrigem().getValor()).getValor(), grafoAGM.obterVertice(destinosOrdenados.get(i).getDestino().getValor()).getValor())) {
-                        novoDestino = new Aresta<>();
+                        novoDestino = new Aresta<>(); // Caminho novo
 
-                        novoDestino.setDestino(destinosOrdenados.get(i).getDestino());
-                        novoDestino.setPeso(destinosOrdenados.get(i).getPeso());
+                        novoDestino.setDestino(destinosOrdenados.get(i).getDestino()); // Origem -> Destino
+                        novoDestino.setPeso(destinosOrdenados.get(i).getPeso()); // Define o peso do caminho
 
+                        // Encontramos o vertice no grafo e adicionamos esse novo destino na lista de destinos dele
                         grafoAGM.obterVertice(destinosOrdenados.get(i).getOrigem().getValor()).adicionarDestino(novoDestino);
 
-                        novoDestino = new Aresta<>();
+                        novoDestino = new Aresta<>(); // Caminho novo
 
-                        novoDestino.setDestino(destinosOrdenados.get(i).getOrigem());
-                        novoDestino.setPeso(destinosOrdenados.get(i).getPeso());
+                        novoDestino.setDestino(destinosOrdenados.get(i).getOrigem()); // Destino -> Origem
+                        novoDestino.setPeso(destinosOrdenados.get(i).getPeso()); // Define o peso do caminho
 
+                        // Encontramos o vertice no grafo e adicionamos esse novo destino na lista de destinos dele
                         grafoAGM.obterVertice(destinosOrdenados.get(i).getDestino().getValor()).adicionarDestino(novoDestino);
+
+                        // Somamos o peso da aresta na variavel
+                        somaTotalPesos += destinosOrdenados.get(i).getPeso();
                     }
                 }
             }
         }
 
-        return grafoAGM;
+        // Ao final, o grafoAGM esta montado e passamos tanto ele quando a soma das suas arestas para a variavel de retorno
+        retorno.add(grafoAGM);
+        retorno.add(somaTotalPesos);
+
+        return retorno;
     }
 
-    // Metodo para determinar o fluxo maximo entre dois vertices
-    public void calculaFluxoMaximo (Vertice<T> origem, Vertice<T> destino) {
-        // fazer uma lista com os valores minimos e maiores que 0
-        //
-
-    }
 }
