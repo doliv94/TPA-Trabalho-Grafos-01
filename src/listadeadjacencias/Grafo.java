@@ -429,7 +429,7 @@ public class Grafo<T> {
         return retorno;
     }
 
-    public float teste (float f, ArrayList<Vertice<T>> verticesCaminho, ArrayList<Aresta<T>> caminho, Vertice<T> origem, Vertice<T> destino) {
+    public float calculaFluxosCaminhos (float fluxoMaximo, ArrayList<Vertice<T>> verticesCaminho, ArrayList<Aresta<T>> caminho, Vertice<T> origem, Vertice<T> destino) {
 
         if (!origem.getDestinos().stream().filter(v -> v.getPeso() > 0).anyMatch(a -> a.getDestino().equals(destino))) {
 
@@ -446,7 +446,7 @@ public class Grafo<T> {
 
 
                     System.out.println(Arrays.deepToString((Object[]) novaAresta.getDestino().getValor()));
-                    return teste(f, verticesCaminho, caminho, origem, destino);
+                    return calculaFluxosCaminhos(fluxoMaximo, verticesCaminho, caminho, origem, destino);
                 }
             }
 
@@ -467,7 +467,7 @@ public class Grafo<T> {
             }
 
             float menorPeso = caminho.stream().min(Comparator.comparing(Aresta<T>::getPeso)).get().getPeso();
-            f += menorPeso;
+            fluxoMaximo += menorPeso;
 
             System.out.println(menorPeso);
             for (int i = 0; i < caminho.size(); i++) {
@@ -480,7 +480,7 @@ public class Grafo<T> {
 
 
 
-        return f;
+        return fluxoMaximo;
     }
     // Metodo para determinar o fluxo maximo entre dois vertices
     public void calculaFluxoMaximo (Vertice<T> o, Vertice<T> d) {
@@ -488,13 +488,13 @@ public class Grafo<T> {
         ArrayList<Vertice<T>> verticesCaminho = new ArrayList<>();
         Vertice<T> origem = o;
         Vertice<T> destino = d;
-        float f = 0.0f;
+        float fluxoMaximo = 0.0f;
 
         verticesCaminho.add(origem);
 
-        f = teste(f, verticesCaminho, caminho, origem, destino);
+        fluxoMaximo = calculaFluxosCaminhos(fluxoMaximo, verticesCaminho, caminho, origem, destino);
 
-        System.out.println(f);
+        System.out.println(fluxoMaximo);
 
     }
 }
