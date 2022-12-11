@@ -434,9 +434,10 @@ public class Grafo<T> {
         if (!origem.getDestinos().stream().filter(v -> v.getPeso() > 0).anyMatch(a -> a.getDestino().equals(destino))) {
 
             for (int i = 0; i < origem.getDestinos().size(); i++) {
-                Vertice<T> finalOrigem = origem;
-                int finalI = i;
+
                 if (origem.getDestinos().get(i).getPeso() > 0 && !verticesCaminho.contains(origem.getDestinos().get(i).getDestino())) {
+                    // System.out.println("--" + Arrays.deepToString((Object[]) origem.getDestinos().get(i).getOrigem().getValor()));
+                    // System.out.println("--" + Arrays.deepToString((Object[]) origem.getDestinos().get(i).getDestino().getValor()));
                     verticesCaminho.add(origem.getDestinos().get(i).getDestino());
 
                     Aresta<T> novaAresta = origem.getDestinos().get(i);
@@ -449,9 +450,23 @@ public class Grafo<T> {
                     return calculaFluxosCaminhos(fluxoMaximo, verticesCaminho, caminho, origem, destino);
                 }
             }
+            System.out.println("-" + Arrays.deepToString((Object[]) origem.getValor()));
+            ArrayList<Aresta<T>> finalCaminho1 = caminho;
 
-            caminho = new ArrayList<>();
-        } else {
+            if (caminho.size() > 0) {
+                origem = caminho.get(caminho.size() - 1).getOrigem();
+                origem.getDestinos().stream().filter(d -> d.getDestino().equals(finalCaminho1.get(finalCaminho1.size() - 1).getDestino())).findAny().get().setPeso(-1);
+                caminho.remove(caminho.size() - 1);
+                return calculaFluxosCaminhos(fluxoMaximo, verticesCaminho, caminho, origem, destino);
+            }
+            else if (caminho.size() == 0 && verticesCaminho.get(0).getDestinos().stream().anyMatch(v -> v.getPeso() > 0)) {
+                origem = verticesCaminho.get(0);
+                ArrayList<Vertice<T>> finalVerticesCaminho = verticesCaminho;
+                origem.getDestinos().stream().filter(d -> d.getDestino().equals(finalVerticesCaminho.get(finalVerticesCaminho.size() - 1))).findAny().get().setPeso(-1);
+                return calculaFluxosCaminhos(fluxoMaximo, verticesCaminho, caminho, origem, destino);
+            }
+        }
+        else {
             Aresta<T> novaAresta = origem.getDestinos().stream().filter(d -> d.getDestino().equals(destino)).findAny().orElse(null);
             System.out.println(Arrays.deepToString((Object[]) novaAresta.getDestino().getValor()));
 
@@ -459,7 +474,6 @@ public class Grafo<T> {
 
             ArrayList<Aresta<T>> caminhoReverso = new ArrayList<>();
             for (int i = 0; i < caminho.size(); i++) {
-                novaAresta = new Aresta<>();
                 ArrayList<Aresta<T>> finalCaminho = caminho;
                 int finalI = i;
                 novaAresta = caminho.get(i).getDestino().getDestinos().stream().filter(d -> d.getDestino().equals(finalCaminho.get(finalI).getOrigem())).findAny().get();
@@ -476,9 +490,18 @@ public class Grafo<T> {
 
                 System.out.println("-> " + caminho.get(i).getPeso() + ", <- " + caminhoReverso.get(i).getPeso());
             }
+
+            if (caminho.get(0).getOrigem().getDestinos().stream().anyMatch(v -> v.getPeso() > 0)) {
+                origem = caminho.get(0).getOrigem();
+
+                caminho = new ArrayList<>();
+                verticesCaminho = new ArrayList<>();
+
+                verticesCaminho.add(origem);
+
+                return calculaFluxosCaminhos(fluxoMaximo, verticesCaminho, caminho, origem, destino);
+            }
         }
-
-
 
         return fluxoMaximo;
     }
