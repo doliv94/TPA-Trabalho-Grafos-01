@@ -226,6 +226,7 @@ public class Main {
             for(int contador = 0; contador < pesos.size(); contador++) {
                 Aresta<String[]> cidadeDestino = new Aresta<>(); // Cria uma nova aresta para armazenar as informacoes de cada cidade destino
 
+                cidadeDestino.setOrigem(cidades.get(cidade)); // Define a origem da cidade
                 cidadeDestino.setDestino(cidades.get(contador)); // Define como destino da cidade destino a cidade de acordo com o contador do loop
 
                 // Define o peso da cidade destino segundo a posicao na lista de pesos da cidade

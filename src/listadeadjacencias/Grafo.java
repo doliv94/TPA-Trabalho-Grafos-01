@@ -3,6 +3,7 @@ package listadeadjacencias;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 
 public class Grafo<T> {
@@ -428,36 +429,72 @@ public class Grafo<T> {
         return retorno;
     }
 
-    public float teste (float f, ArrayList<Vertice<T>> listaVertices, Vertice<T> origem, Vertice<T> destino) {
+    public float teste (float f, ArrayList<Vertice<T>> verticesCaminho, ArrayList<Aresta<T>> caminho, Vertice<T> origem, Vertice<T> destino) {
 
-        for (int i = 0; i < origem.getDestinos().size(); i++) {
-            if (origem.getDestinos().get(i).getPeso() > 0 && !listaVertices.contains(origem.getDestinos().get(i).getDestino())) {
-                if (!origem.getDestinos().stream().filter(v -> v.getPeso() > 0).anyMatch(a -> a.getDestino().equals(destino))) {
+        if (!origem.getDestinos().stream().filter(v -> v.getPeso() > 0).anyMatch(a -> a.getDestino().equals(destino))) {
+
+            for (int i = 0; i < origem.getDestinos().size(); i++) {
+                Vertice<T> finalOrigem = origem;
+                int finalI = i;
+                if (origem.getDestinos().get(i).getPeso() > 0 && !verticesCaminho.contains(origem.getDestinos().get(i).getDestino())) {
+                    verticesCaminho.add(origem.getDestinos().get(i).getDestino());
+
+                    Aresta<T> novaAresta = origem.getDestinos().get(i);
+                    caminho.add(novaAresta);
+
                     origem = origem.getDestinos().get(i).getDestino();
-                    listaVertices.add(origem);
-                    System.out.println(Arrays.deepToString((Object[]) origem.getValor()));
-                    return teste(f, listaVertices, origem, destino);
-                }
-                else {
-                    System.out.println(Arrays.deepToString((Object[]) destino.getValor()));
-                    f += origem.getDestinos().get(i).getPeso();
-                    listaVertices.add(destino);
+
+
+                    System.out.println(Arrays.deepToString((Object[]) novaAresta.getDestino().getValor()));
+                    return teste(f, verticesCaminho, caminho, origem, destino);
                 }
             }
+
+            caminho = new ArrayList<>();
+        } else {
+            Aresta<T> novaAresta = origem.getDestinos().stream().filter(d -> d.getDestino().equals(destino)).findAny().orElse(null);
+            System.out.println(Arrays.deepToString((Object[]) novaAresta.getDestino().getValor()));
+
+            caminho.add(novaAresta);
+
+            ArrayList<Aresta<T>> caminhoReverso = new ArrayList<>();
+            for (int i = 0; i < caminho.size(); i++) {
+                novaAresta = new Aresta<>();
+                ArrayList<Aresta<T>> finalCaminho = caminho;
+                int finalI = i;
+                novaAresta = caminho.get(i).getDestino().getDestinos().stream().filter(d -> d.getDestino().equals(finalCaminho.get(finalI).getOrigem())).findAny().get();
+                caminhoReverso.add(novaAresta);
+            }
+
+            float menorPeso = caminho.stream().min(Comparator.comparing(Aresta<T>::getPeso)).get().getPeso();
+            f += menorPeso;
+
+            System.out.println(menorPeso);
+            for (int i = 0; i < caminho.size(); i++) {
+                caminho.get(i).setPeso(caminho.get(i).getPeso() - menorPeso);
+                caminhoReverso.get(i).setPeso(caminhoReverso.get(i).getPeso() + menorPeso);
+
+                System.out.println("-> " + caminho.get(i).getPeso() + ", <- " + caminhoReverso.get(i).getPeso());
+            }
         }
+
+
 
         return f;
     }
     // Metodo para determinar o fluxo maximo entre dois vertices
-    public void calculaFluxoMaximo (Vertice<T> origem, Vertice<T> destino) {
-        ArrayList<Vertice<T>> listaVertices = new ArrayList<>();
-        ArrayList<Aresta<T>> listaArestasReversa = new ArrayList<>();
-
+    public void calculaFluxoMaximo (Vertice<T> o, Vertice<T> d) {
+        ArrayList<Aresta<T>> caminho = new ArrayList<>();
+        ArrayList<Vertice<T>> verticesCaminho = new ArrayList<>();
+        Vertice<T> origem = o;
+        Vertice<T> destino = d;
         float f = 0.0f;
 
-        listaVertices.add(origem);
-        f = teste(f, listaVertices, origem, destino);
+        verticesCaminho.add(origem);
+
+        f = teste(f, verticesCaminho, caminho, origem, destino);
 
         System.out.println(f);
+
     }
 }
