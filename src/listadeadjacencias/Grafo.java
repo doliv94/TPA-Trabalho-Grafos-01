@@ -429,95 +429,162 @@ public class Grafo<T> {
         return retorno;
     }
 
-    public float calculaFluxosCaminhos (float fluxoMaximo, ArrayList<Vertice<T>> verticesCaminho, ArrayList<Aresta<T>> caminho, Vertice<T> origem, Vertice<T> destino) {
+    // Metodo recursivo chamado para calcular o fluxo entre dois vertices
+    // Ele funciona assim:
+    // Faz uma comparacao para saber se o vertice de destino esta dentre os vertices de destino do vertice de origem
+    // ..Caso o vertice de destino esteja lá, pega a aresta do vertice de origem ate o vertice de destino e adiciona na lista caminho, monta a lista
+    // com o caminho reverso, encontra a aresta de menor valor e atualiza as listas de caminho nos dois sentidos. Depois disso,
+    // se o vertice de origem ainda tiver capacidade positiva, repete o processo com as arestas atualizadas
+    // ..Caso o vertice de destino nao esteja na lista de destinos do vertice de origem, vai passar pelos destinos dele
+    // e assim que encontrar um caminho, adicionar nas listas e tentar seguir a partir desse novo vertice ate o destino
+    // O processo vai se repetir com os valores das listas e do vertice de origem sendo atualizados ate nao haver possibilidade
+    // de seguir um caminho com capacidade positiva
+    private float calculaFluxosCaminhos (float fluxoMaximo, ArrayList<Vertice<T>> verticesCaminho, ArrayList<Aresta<T>> caminho, Vertice<T> origem, Vertice<T> destino) {
 
+        // Se o vertice de origem nao tem caminho para o vertice de destino
         if (!origem.getDestinos().stream().filter(v -> v.getPeso() > 0).anyMatch(a -> a.getDestino().equals(destino))) {
 
+            // Olha cada destino desse vertice de origem
             for (int i = 0; i < origem.getDestinos().size(); i++) {
 
+                // ...Se houver caminho e o vertice ainda nao tiver sido checado
                 if (origem.getDestinos().get(i).getPeso() > 0 && !verticesCaminho.contains(origem.getDestinos().get(i).getDestino())) {
-                    // System.out.println("--" + Arrays.deepToString((Object[]) origem.getDestinos().get(i).getOrigem().getValor()));
-                    // System.out.println("--" + Arrays.deepToString((Object[]) origem.getDestinos().get(i).getDestino().getValor()));
+                    // Adiciona o destino na lista dos vertices que podem fazer parte do caminho
                     verticesCaminho.add(origem.getDestinos().get(i).getDestino());
 
+                    // Cria uma nova aresta que vai receber o caminho entre o vertice de origem e esse destino atual
                     Aresta<T> novaAresta = origem.getDestinos().get(i);
-                    caminho.add(novaAresta);
+                    caminho.add(novaAresta); // Adiciona essa aresta na lista de caminho
 
+                    // Define o vertice de origem como o destino atual que foi encontrado, para continuar o caminho a partir dele
                     origem = origem.getDestinos().get(i).getDestino();
 
+                        // System.out.println(Arrays.deepToString((Object[]) novaAresta.getDestino().getValor()));
 
-                    System.out.println(Arrays.deepToString((Object[]) novaAresta.getDestino().getValor()));
+                    // Faz a recursao com as listas e o vertice de origem atualizados
                     return calculaFluxosCaminhos(fluxoMaximo, verticesCaminho, caminho, origem, destino);
                 }
             }
-            System.out.println("-" + Arrays.deepToString((Object[]) origem.getValor()));
+            // Se chegou aqui, significa que o caminho que estava sendo seguido nao tem como chegar ao vertice de destino
+
+                // System.out.println("-" + Arrays.deepToString((Object[]) origem.getValor()));
+
+            // Faz uma copia de caminho para comparacao na utilizacao dos metodos de stream (regra do java)
             ArrayList<Aresta<T>> finalCaminho1 = caminho;
 
+            // Se a lista de caminho tiver tamanho maior que 0
             if (caminho.size() > 0) {
+                // Redefine a origem como o vertice que foi origem desse na lista de caminho
                 origem = caminho.get(caminho.size() - 1).getOrigem();
+
+                // Usa stream para pegar o vertice que foi destino da origem (esse que foi origem agora e nao teve caminho)
+                // e entao mudar o valor dele para -1, para ficar marcado como um caminho invalido de seguir
                 origem.getDestinos().stream().filter(d -> d.getDestino().equals(finalCaminho1.get(finalCaminho1.size() - 1).getDestino())).findAny().get().setPeso(-1);
+
+                // Remove essa aresta da lista de caminho, uma vez que nao deu no destino
                 caminho.remove(caminho.size() - 1);
+
+                // Retorna a tentativa, com os valores atualizados
                 return calculaFluxosCaminhos(fluxoMaximo, verticesCaminho, caminho, origem, destino);
             }
+            // Se o caminho tiver tamanho 0 e ainda ha capacidade positiva para seguir no vertice de origem
             else if (caminho.size() == 0 && verticesCaminho.get(0).getDestinos().stream().anyMatch(v -> v.getPeso() > 0)) {
-                origem = verticesCaminho.get(0);
+                origem = verticesCaminho.get(0); // Redefine a origem como o primeiro vertice (o vertice de origem oficial)
+
+                // Faz uma copia da lista dos vertices possieis para caminho para comparacao na utilizacao dos metodos de stream (regra do java)
                 ArrayList<Vertice<T>> finalVerticesCaminho = verticesCaminho;
+
+                // Usa stream para pegar o vertice que foi destino da origem (esse que foi origem agora e nao teve caminho)
+                // e entao mudar o valor dele para -1, para ficar marcado como um caminho invalido de seguir
                 origem.getDestinos().stream().filter(d -> d.getDestino().equals(finalVerticesCaminho.get(finalVerticesCaminho.size() - 1))).findAny().get().setPeso(-1);
+
+                // Retorna a tentativa, com os valores atualizados
                 return calculaFluxosCaminhos(fluxoMaximo, verticesCaminho, caminho, origem, destino);
             }
         }
+        // Se o vertice de origem tem caminho para o vertice de destino
         else {
-            Aresta<T> novaAresta = origem.getDestinos().stream().filter(d -> d.getDestino().equals(destino)).findAny().orElse(null);
-            System.out.println(Arrays.deepToString((Object[]) novaAresta.getDestino().getValor()));
 
+            // .stream, maravilhoso stream
+            // Usa o metodo stream para encontrar a aresta que tem o vertice de destino e passa ela para uma nova aresta
+            Aresta<T> novaAresta = origem.getDestinos().stream().filter(d -> d.getDestino().equals(destino)).findAny().orElse(null);
+
+                // System.out.println(Arrays.deepToString((Object[]) novaAresta.getDestino().getValor()));
+
+            // Adiciona a nova aresta de caminho na lista de caminho
             caminho.add(novaAresta);
 
+            // Monta uma lista de retorno, os vertices na lista caminho que eram origem, viram destino e vice versa, pegando
+            // o peso deles no sentido contrario
             ArrayList<Aresta<T>> caminhoReverso = new ArrayList<>();
             for (int i = 0; i < caminho.size(); i++) {
+
+                // Para usar a lista caminho e o int i na comparacao da stream eh preciso copia-los como uma variavel final
+                // para evitar problemas que pudessem vir de modificacoes (regra do java)
                 ArrayList<Aresta<T>> finalCaminho = caminho;
                 int finalI = i;
+
+                // Encontra a aresta inversa a do caminho
                 novaAresta = caminho.get(i).getDestino().getDestinos().stream().filter(d -> d.getDestino().equals(finalCaminho.get(finalI).getOrigem())).findAny().get();
+                // Adiciona ela na lista caminhoReverso
                 caminhoReverso.add(novaAresta);
             }
 
+            // Usa o stream para encontrar o menor valor dentre as arestas do caminho
             float menorPeso = caminho.stream().min(Comparator.comparing(Aresta<T>::getPeso)).get().getPeso();
-            fluxoMaximo += menorPeso;
+            fluxoMaximo += menorPeso; // Adiciona o menor valor na variavel do fluxo maximo
 
-            System.out.println(menorPeso);
+                // System.out.println(menorPeso);
+
+            // Diminui a capacidade dos caminhos na ida e aumenta na volta
             for (int i = 0; i < caminho.size(); i++) {
+                // Na ida, pega cada aresta da lista caminho e subtrai com o menor peso encontrado antes
                 caminho.get(i).setPeso(caminho.get(i).getPeso() - menorPeso);
+
+                // Na volta, pega cada aresta da lista caminhoReverso e soma com o menor peso encontrado antes
                 caminhoReverso.get(i).setPeso(caminhoReverso.get(i).getPeso() + menorPeso);
 
-                System.out.println("-> " + caminho.get(i).getPeso() + ", <- " + caminhoReverso.get(i).getPeso());
+                    // System.out.println("-> " + caminho.get(i).getPeso() + ", <- " + caminhoReverso.get(i).getPeso());
             }
 
+            // ...Se o vertice de origem ainda tiver capacidade positiva
             if (caminho.get(0).getOrigem().getDestinos().stream().anyMatch(v -> v.getPeso() > 0)) {
-                origem = caminho.get(0).getOrigem();
+                origem = caminho.get(0).getOrigem(); // Redefine origem como o vertice de origem e nao o atual
 
-                caminho = new ArrayList<>();
-                verticesCaminho = new ArrayList<>();
+                caminho = new ArrayList<>(); // Libera caminho para guardar um novo caminho
+                verticesCaminho = new ArrayList<>(); // Esvazia a lista com os vertices que podem estar no caminho
 
-                verticesCaminho.add(origem);
+                verticesCaminho.add(origem); // Ja adiciona a origem na lista
 
+                // Repete o processo, tendo em mente que os valores dos caminhos foram atualizados
                 return calculaFluxosCaminhos(fluxoMaximo, verticesCaminho, caminho, origem, destino);
             }
         }
 
+        // Retorna o valor do fluxo maximo ate entao
         return fluxoMaximo;
     }
+
     // Metodo para determinar o fluxo maximo entre dois vertices
-    public void calculaFluxoMaximo (Vertice<T> o, Vertice<T> d) {
+    public float calculaFluxoMaximo (Vertice<T> verticeOrigem, Vertice<T> verticeDestino) {
+
+        // Lista que guarda o caminho que foi percorrido, as arestas a partir do vertice de origem ate chegar no vertice de destino
         ArrayList<Aresta<T>> caminho = new ArrayList<>();
+
+        // Lista para saber quais vertices ja foram visitados durante o percurso, sendo eles parte do caminho encontrado ou nao
         ArrayList<Vertice<T>> verticesCaminho = new ArrayList<>();
-        Vertice<T> origem = o;
-        Vertice<T> destino = d;
-        float fluxoMaximo = 0.0f;
 
-        verticesCaminho.add(origem);
+        Vertice<T> origem = verticeOrigem; // Faz uma copia do vertice de origem para passar como parametro
+        float fluxoMaximo = 0.0f; // Variavel que vai
 
-        fluxoMaximo = calculaFluxosCaminhos(fluxoMaximo, verticesCaminho, caminho, origem, destino);
+        verticesCaminho.add(origem); // Adiciona o vertice de origem na lista dos vertices que farao parte do percurso testado
 
-        System.out.println(fluxoMaximo);
+        // Chama o metodo recursivo que vai calcular o fluxo dos caminhos, retornando o valor do fluxo maximo
+        // De parametro ele recebe: o fluxo maximo, que por hora eh 0 (fluxoMaximo), a lista dos vertices que sao testados para encontrar
+        // o caminho (verticesCaminho), a lista com o caminho percorrido comecando vazia (caminho), o vertice de origem de
+        // onde comeca a busca (origem) e o vertice de destino que sera usado como ponto de chegada para comparacao (verticeDestino)
+        fluxoMaximo = calculaFluxosCaminhos(fluxoMaximo, verticesCaminho, caminho, origem, verticeDestino);
 
+        return fluxoMaximo; // Retorna o fluxo maximo encontrado durante no metodo
     }
 }

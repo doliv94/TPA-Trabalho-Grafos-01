@@ -14,17 +14,24 @@ import listadeadjacencias.*;
 
 
 public class Main {
+
     // Metodo chamado para obter e imprimir o fluxo maximo entre dois vertices
     private static void imprimeFluxoMaximo(Grafo<String[]> grafo, int cidadeOrigem, int cidadeDestino) {
         Vertice<String[]> cidadeO = grafo.getVertices().get(cidadeOrigem - 1); // Pega o vertice da cidade de origem de acordo com o codigo de entrada
         Vertice<String[]> cidadeD = grafo.getVertices().get(cidadeDestino - 1); // Pega o vertice da cidade de destino de acordo com o codigo de entrada
+
+        float fluxoMaximo = 0.0f; // Variavel que vai receber o valor do fluxo maximo encontrado
 
         // ...Se os vertices das duas cidades existirem e nao forem nulos
         if(cidadeO != null && cidadeD != null) {
             System.out.println("\nCidade de Origem: " + Arrays.deepToString(cidadeO.getValor()));
             System.out.println("Cidade de Destino: " + Arrays.deepToString(cidadeD.getValor()));
 
-            grafo.calculaFluxoMaximo(cidadeO, cidadeD); // Chama o metodo do fluxo maximo
+            fluxoMaximo = grafo.calculaFluxoMaximo(cidadeO, cidadeD); // Chama o metodo que vai calcular o fluxo maximo entre os dois vertices
+
+            // Imprime o resultado
+            System.out.print("\n---");
+            System.out.println("\nFluxo máximo entre as duas cidades: " + fluxoMaximo);
         }
         // ...Se por algum motivo um dos vertices existir, mas seu valor for nulo
         else {
@@ -458,8 +465,8 @@ public class Main {
         // Le o arquivo gerado
         grafo = abreArquivo(nomeArquivoEntrada); // O grafo vai receber os valores do arquivo a partir desse metodo
 
-        // O arquivo de 7 entradas utilizado aqui foi criado manualmente, com base no grafo do exemplo do algoritmo
-        // de Ford-Fulkerson disponibilizado no slide do ava
+        // Os arquivos de 7 e 4 entradas da pasta foram criados manualmente, o de 7 com base no grafo do exemplo do algoritmo
+        // de Ford-Fulkerson disponibilizado no slide do ava, e o 4 a partir de uma imagem online para testar se realmente funcionava
 
         // Como dito em entregas anteriores, as modificacoes feitas no Gerador de Arquivos impedem que seja criado mais de um
         // arquivo com mesmo nome (que eh nomeado pela quantidade de entradas) dentro da pasta _entrada_registros,
