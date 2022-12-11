@@ -3,6 +3,7 @@ package listadeadjacencias;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.function.Predicate;
 
 public class Grafo<T> {
     // O grafo eh formado por uma lista de vertices (cidades, nesse caso)
@@ -427,10 +428,36 @@ public class Grafo<T> {
         return retorno;
     }
 
+    public float teste (float f, ArrayList<Vertice<T>> listaVertices, Vertice<T> origem, Vertice<T> destino) {
+
+        for (int i = 0; i < origem.getDestinos().size(); i++) {
+            if (origem.getDestinos().get(i).getPeso() > 0 && !listaVertices.contains(origem.getDestinos().get(i).getDestino())) {
+                if (!origem.getDestinos().stream().filter(v -> v.getPeso() > 0).anyMatch(a -> a.getDestino().equals(destino))) {
+                    origem = origem.getDestinos().get(i).getDestino();
+                    listaVertices.add(origem);
+                    System.out.println(Arrays.deepToString((Object[]) origem.getValor()));
+                    return teste(f, listaVertices, origem, destino);
+                }
+                else {
+                    System.out.println(Arrays.deepToString((Object[]) destino.getValor()));
+                    f += origem.getDestinos().get(i).getPeso();
+                    listaVertices.add(destino);
+                }
+            }
+        }
+
+        return f;
+    }
     // Metodo para determinar o fluxo maximo entre dois vertices
     public void calculaFluxoMaximo (Vertice<T> origem, Vertice<T> destino) {
+        ArrayList<Vertice<T>> listaVertices = new ArrayList<>();
+        ArrayList<Aresta<T>> listaArestasReversa = new ArrayList<>();
 
+        float f = 0.0f;
 
+        listaVertices.add(origem);
+        f = teste(f, listaVertices, origem, destino);
 
+        System.out.println(f);
     }
 }
