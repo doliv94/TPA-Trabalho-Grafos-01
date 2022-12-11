@@ -1,6 +1,7 @@
 // Na 3a etapa do trabalho foi implementado o Algoritmo de Kruskal
 
-// TPA - 3a Etapa do Trabalho Prático de Grafos - prof. Victorio Carvalho
+// TPA - 4a e Ultima Etapa do Trabalho Prático de Grafos - prof. Victorio Carvalho
+// (os codigos das etapas anteriores tambem estao presentes aqui)
 // Ifes Serra 2022/2
 // Dupla: Brunna Dalzini e Rafaela Amorim Pessim
 
